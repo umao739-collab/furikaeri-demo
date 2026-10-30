@@ -112,6 +112,24 @@ const OL='#6b5646';
 const COL={bear:['#C99A6B','#F3E0C7','くま'],cat:['#E4DFD3','#fff','ねこ'],rabbit:['#fff','#FFE3EA','うさぎ'],dog:['#E8C28A','#FFF3DC','いぬ'],lion:['#F2C46B','#FFF0C9','ライオン'],chick:['#FFD84D','#FFF0A8','ひよこ'],hamster:['#DE9D5E','#FFFFFF','ハムスター'],koala:['#B9BCC4','#EEF0F3','コアラ'],elephant:['#B7C6DB','#E4ECF6','ぞう']};
 function charSVG(t){
  const [b,bl]=COL[t];
+ if(t=='hamster')return `<svg viewBox="0 0 100 110"><ellipse cx="50" cy="105" rx="32" ry="5.5" fill="rgba(0,0,0,.15)"/>
+<g class="bodyg">
+ <circle cx="27" cy="25" r="10" fill="${b}" stroke="${OL}" stroke-width="1.6"/><circle cx="73" cy="25" r="10" fill="${b}" stroke="${OL}" stroke-width="1.6"/>
+ <circle cx="27" cy="27" r="5.2" fill="#8A5E40"/><circle cx="73" cy="27" r="5.2" fill="#8A5E40"/>
+ <path d="M50 20 C31 20 21 29 17 41 C8 45 5 59 11 68 C7 79 10 96 28 102 C40 105 60 105 72 102 C90 96 93 79 89 68 C95 59 92 45 83 41 C79 29 69 20 50 20Z" fill="${b}" stroke="${OL}" stroke-width="1.6" stroke-linejoin="round"/>
+ <path d="M50 51 C58 51 66 57 78 60 C85 68 83 93 50 100 C17 93 15 68 22 60 C34 57 42 51 50 51Z" fill="#fff"/>
+ <path d="M46 20 q4 -2 8 0 q-1 10 -4 17 q-3 -7 -4 -17Z" fill="#8A5E40"/>
+ <path d="M12 74 q4 -6 8 -2 M88 74 q-4 -6 -8 -2" fill="none" stroke="#8A5E40" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+ <g class="eyes"><circle cx="35" cy="43" r="3.6" fill="#2b2320"/><circle cx="65" cy="43" r="3.6" fill="#2b2320"/><circle cx="36" cy="41.7" r="1.2" fill="#fff"/><circle cx="66" cy="41.7" r="1.2" fill="#fff"/></g>
+ <g stroke="#4a3a33" stroke-width=".9" stroke-linecap="round" fill="none"><path d="M36 54 q-8 -2 -15 -4 M36 57 q-9 0 -16 0 M37 60 q-8 2 -14 5 M64 54 q8 -2 15 -4 M64 57 q9 0 16 0 M63 60 q8 2 14 5"/></g>
+ <ellipse cx="50" cy="53" rx="3.2" ry="2.4" fill="#F4A3B4"/>
+ <path d="M50 55.4 v2 M45 58 q5 4 5 -1 q0 5 5 1" fill="none" stroke="#4a3a33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+ <rect x="48.2" y="59.4" width="3.6" height="3.8" rx="1" fill="#fff" stroke="#6b5646" stroke-width=".8"/>
+ <g transform="translate(50 80)"><ellipse rx="6" ry="11" fill="#4b4540" stroke="${OL}" stroke-width="1.2"/><path d="M0 -10 V10 M-3.3 -8 q-1 8 0 16 M3.3 -8 q1 8 0 16" stroke="#B9AE9E" stroke-width="1.2" fill="none"/></g>
+ <ellipse cx="41" cy="79" rx="5" ry="4" fill="#F6C9B4" stroke="${OL}" stroke-width="1.2"/><ellipse cx="59" cy="79" rx="5" ry="4" fill="#F6C9B4" stroke="${OL}" stroke-width="1.2"/>
+ <ellipse class="fl" cx="34" cy="102" rx="9" ry="5.5" fill="#F6C9B4" stroke="${OL}" stroke-width="1.6"/>
+ <ellipse class="fr" cx="66" cy="102" rx="9" ry="5.5" fill="#F6C9B4" stroke="${OL}" stroke-width="1.6"/>
+</g></svg>`;
  let ears='',face='',tail='',extra='';const H=t=='hamster',brx=H?31:23,bry=H?22:20,hrx=H?44:35,hry=H?32:30;
  if(t=='bear')ears=`<circle cx="22" cy="26" r="11" fill="${b}" stroke="${OL}" stroke-width="1.6"/><circle cx="78" cy="26" r="11" fill="${b}" stroke="${OL}" stroke-width="1.6"/><circle cx="22" cy="27" r="5" fill="#F6C9B4"/><circle cx="78" cy="27" r="5" fill="#F6C9B4"/>`;
  if(t=='cat')ears=`<path d="M19 34 L24 8 L44 22Z" fill="${b}" stroke="${OL}" stroke-width="1.6" stroke-linejoin="round"/><path d="M81 34 L76 8 L56 22Z" fill="${b}" stroke="${OL}" stroke-width="1.6" stroke-linejoin="round"/><path d="M25 26 L27 15 L36 22Z" fill="#F6B9C4"/><path d="M75 26 L73 15 L64 22Z" fill="#F6B9C4"/>`,tail=`<path d="M70 92 q22 -2 20 -22" fill="none" stroke="${OL}" stroke-width="7" stroke-linecap="round"/><path d="M70 92 q22 -2 20 -22" fill="none" stroke="${b}" stroke-width="4.5" stroke-linecap="round"/>`;
