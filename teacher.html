@@ -1,0 +1,304 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>先生画面 操作デモ</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:#E8EEE6;color:#3a3a35;font-family:'Zen Maru Gothic','Hiragino Maru Gothic ProN','Meiryo',sans-serif;font-weight:500;line-height:1.7;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 60px}
+.wrap{max-width:1040px;margin:0 auto}
+.demo{background:#3a3a35;color:#fff;border-radius:14px;padding:8px 14px;font-size:12px;font-weight:700;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.demo button{margin-left:auto;background:#fff;color:#3a3a35;border:0;border-radius:999px;padding:4px 12px;font:inherit;font-size:12px;font-weight:900;cursor:pointer}
+.win{border-radius:26px;background:linear-gradient(180deg,#FFF6DD,#FCE9D4);box-shadow:0 8px 26px rgba(0,0,0,.14);padding:14px 18px 22px;min-height:70vh}
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.logo{font-weight:900;font-size:15px;color:#C24F28;cursor:pointer}
+.rt{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.mini{background:#fff;border:0;border-radius:999px;padding:5px 12px;font:inherit;font-size:12px;font-weight:900;color:#C24F28;box-shadow:0 2px 6px rgba(0,0,0,.08);cursor:pointer}
+.who{background:#fff;border-radius:999px;padding:4px 12px;font-size:12px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.greet{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.mas{width:38px;flex:none}
+.bub{background:#fff;border-radius:18px 18px 18px 4px;padding:6px 12px;font-size:13px;font-weight:700;box-shadow:0 3px 8px rgba(0,0,0,.08)}
+.bub b{color:#C24F28}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:#fff;border-radius:999px;padding:5px 13px;font-size:12px;font-weight:900;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.chip.red{background:#FF5A5F;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.cls{background:#fff;border-radius:20px;padding:10px 12px;box-shadow:0 5px 0 rgba(0,0,0,.08);min-width:0}
+.cls h3{margin:0 0 4px;font-size:16px;font-weight:900;display:flex;align-items:center;gap:8px}
+.cls h3 small{font-size:11px;font-weight:700;color:#8a6a2b;background:#FFF0C2;border-radius:999px;padding:2px 9px}
+.sj{display:flex;align-items:center;gap:8px;border-radius:12px;padding:6px 10px;margin-top:4px;font-weight:900;font-size:13px;cursor:pointer;transition:transform .15s;border:0;width:100%;font-family:inherit;text-align:left;color:inherit}
+.sj:hover{transform:translateY(-2px)}
+.sj small{margin-left:auto;font-size:11px;font-weight:700;opacity:.85}
+.bd{background:#FF5A5F;color:#fff;border-radius:999px;font-size:10px;padding:1px 8px;font-weight:900}
+.botrow{display:grid;grid-template-columns:1.6fr 1fr;gap:10px;margin-top:10px}
+@media(max-width:720px){.botrow{grid-template-columns:1fr}}
+.card{background:#fff;border-radius:20px;padding:12px 16px;margin-top:10px;box-shadow:0 4px 12px rgba(0,0,0,.07)}
+.botrow .card{margin-top:0}
+.lbl{font-size:12px;font-weight:900;color:#C24F28;margin-bottom:4px}
+.ttl{font-size:15px;font-weight:900;color:#C24F28;margin-bottom:6px}
+.fld{display:flex;flex-direction:column;gap:3px;margin-top:8px;min-width:0}
+.addrow{display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap}.addrow .fld{flex:1;min-width:100px;margin-top:2px}
+input[type=text],input[type=date],select,textarea{width:100%;background:#FFFBF0;border:2px solid #F3E2BC;border-radius:14px;padding:7px 12px;font:inherit;font-size:14px;font-weight:700;color:#3a3a35}
+textarea{line-height:1.6;resize:vertical;font-weight:500}
+input:focus,select:focus,textarea:focus{outline:2px solid #E8734A;outline-offset:1px}
+.btn{border:0;border-radius:16px;padding:9px 18px;font:inherit;font-weight:900;font-size:13px;box-shadow:0 4px 0 rgba(0,0,0,.12);background:#E8734A;color:#fff;cursor:pointer}
+.btn.w{background:#fff;color:#C24F28}.btn.sm{padding:4px 12px;font-size:12px;box-shadow:0 2px 0 rgba(0,0,0,.1)}.btn.red{color:#b33}
+.btn:disabled{opacity:.45;cursor:default}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.back{background:#fff;border:0;border-radius:999px;padding:5px 14px;font:inherit;font-size:12px;font-weight:900;color:#C24F28;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.hd{display:flex;align-items:center;gap:10px;margin:4px 0 8px;flex-wrap:wrap}
+.hd h2{margin:0;font-size:20px;font-weight:900}
+.pill{background:#FFD9D9;color:#C24F28;border-radius:999px;padding:3px 12px;font-size:12px;font-weight:900}
+.hd select{width:auto;min-width:180px}
+.tabs{display:flex;gap:8px;margin:6px 0 12px;flex-wrap:wrap}
+.tab{flex:1 1 120px;text-align:center;border-radius:16px;padding:9px 6px;font:inherit;font-size:14px;font-weight:900;background:rgba(255,255,255,.6);box-shadow:0 3px 0 rgba(0,0,0,.06);position:relative;border:0;cursor:pointer;color:#3a3a35}
+.tab.on{background:#fff;color:#C24F28;box-shadow:0 4px 0 rgba(0,0,0,.1)}
+.tab .bd{position:absolute;top:-7px;right:6px}
+.per{display:flex;gap:6px;flex-wrap:wrap}
+.per button{min-width:42px;text-align:center;border-radius:12px;padding:6px 10px;background:#FFF1E6;font:inherit;font-weight:900;font-size:13px;position:relative;border:0;cursor:pointer;color:#3a3a35}
+.per button.on{background:#E8734A;color:#fff}
+.per .bd{position:absolute;top:-8px;right:-6px;font-size:9px;padding:0 6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:640px){.two{grid-template-columns:1fr}}
+.row{display:flex;align-items:flex-start;gap:12px;padding:10px 8px;border-bottom:1px dashed #eadfc9}
+.row:last-child{border:0}
+.row.pend{background:#FFF4EE;border-radius:16px;border-bottom:0;margin-bottom:4px}
+.row.abs{opacity:.55}
+.av{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:15px;flex:none}
+.rb{min-width:0;flex:1}
+.nm{font-weight:900;font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tx{font-size:13px;line-height:1.7;margin-top:2px}
+.cnt{font-size:11px;color:#8a8a80;margin-left:6px}
+.st{font-size:11px;font-weight:900;border-radius:999px;padding:2px 10px}
+.st.p{background:#FF5A5F;color:#fff}.st.d{background:#DFF3DC;color:#3d7a35}.st.n{background:#eee;color:#888}
+.ab{font-size:12px;font-weight:700;color:#8a6a2b;display:flex;align-items:center;gap:4px;cursor:pointer}
+.cm{font-size:12.5px;background:#F3F8EE;border-radius:12px;padding:6px 10px;margin-top:6px;line-height:1.7}
+.hint{font-size:12px;color:#7a7a6a;line-height:1.7;margin:4px 0 0}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:6px}
+.stp{background:#FFF6EE;border-radius:16px;padding:10px 12px;font-size:12.5px;line-height:1.7;display:flex;flex-direction:column;align-items:flex-start}
+.stp b{font-size:13.5px;color:#C24F28}
+.warn{border:2px solid #F2C14E}
+.pr{border:1px solid #F0E2C8;border-radius:16px;padding:10px 12px;margin-top:10px;background:#FFFCF5}
+.prh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:14px}
+.mini2{background:#FFF0C2;border-radius:999px;padding:1px 10px;font-size:11px;font-weight:900}
+.pg{display:flex;gap:6px;flex-wrap:wrap}.pg button{border:0;border-radius:12px;padding:5px 12px;background:#FFF1E6;font:inherit;font-weight:900;font-size:13px;cursor:pointer;color:#3a3a35}.pg button.on{background:#E8734A;color:#fff}
+.gd{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:6px}
+.gc{background:#FFF1E6;border-radius:16px;padding:10px 12px;font-size:12.5px;line-height:1.6;display:flex;flex-direction:column;gap:2px}.gc b{font-size:13.5px}.gc.w{background:#fff;border:1px solid #F0E2C8}
+.demo-box{border:2px dashed #E8C7A8;border-radius:16px;height:80px;display:flex;align-items:center;justify-content:center;color:#a98;font-size:13px;background:#FFFBF0}
+.det{margin-top:12px;border:2px dashed #E8C7A8;border-radius:16px;padding:6px 14px}
+.det summary{cursor:pointer;font-size:13px;color:#8a6a2b;font-weight:700;padding:6px 0}
+.chk{display:flex;gap:8px;align-items:center;font-size:13px;font-weight:700;margin-top:10px;cursor:pointer}
+.chk input{width:auto}
+.tl{border-left:3px solid #F3C7B4;margin:8px 0 0 8px;padding-left:14px}
+.tl .it{margin-bottom:12px;position:relative}
+.tl .it:before{content:"";position:absolute;left:-22px;top:6px;width:12px;height:12px;border-radius:50%;background:#E8734A}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));translate:-50% 0;background:rgba(50,45,40,.92);color:#fff;border-radius:999px;padding:9px 18px;font-size:13px;font-weight:700;z-index:99;max-width:90vw}
+.rev{border:2px solid #F3E2BC;border-radius:16px;padding:10px 12px;margin-top:12px;background:#FFFCF5}
+.rev .it{background:#fff;border-radius:12px;padding:8px 10px;margin-bottom:8px}
+</style>
+<div class="wrap">
+ <div class="demo">🧪 操作デモです。表示されている児童や文章は、すべて見本用の作り物です。保存はされません。<button data-act="reset">最初の状態に戻す</button></div>
+ <div class="win" id="app"></div>
+</div>
+<div id="toast"></div>
+<script>
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const NAMES=['さくら','はると','みお','そうた','ゆい','りく','あおい','ひなた'];
+const AVC=['#FFD9D9','#D9ECFF','#DFF3DC','#FFF0C2','#E3D9FA','#FFE3D0','#D8F0F0','#F8DDF0'];
+const SUBJ={'国語':['📕','#FFD9D9'],'算数':['🔢','#D9ECFF'],'理科':['🌱','#DFF3DC'],'外国語':['🔤','#E3D9FA'],'音楽':['🎵','#FFF0C2'],'家庭科':['🧵','#FFE3D0'],'社会':['🌏','#FDEBC8'],'体育':['🏃','#D8F0F0'],'図工':['🎨','#F8DDF0'],'道徳':['💛','#FFF3B8']};
+const MULTI=['専科','教科担任制','特別支援','通級'];
+const ALLCLS=['4年1組','4年2組','5年1組','6年1組'];
+const G=['今日の学習で分かったことをノートにまとめた。','友達の考えを聞いて、新しい発見があった。','むずかしかったけど、最後まで考えられた。','もっと詳しく調べてみたいと思った。','前の授業とつながっていると気づいた。','先生の説明がよく分かった。','自分の考えを言葉にできた。','次は自分から発表したい。'];
+const CM=['分かったことを自分の言葉でまとめられていますね。次も続けてみましょう。','友達の考えから学べたことがすてきです。','むずかしくても最後まで考えた姿勢がよいですね。','調べてみたい気持ちを大切にしてください。','つながりに気づけたのがよいですね。','説明をしっかり聞けていました。','自分の考えを言葉にできていて、よいですね。','次の発表を楽しみにしています。'];
+const T3=['ごんが兵十につぐないをするところで、ごんのさみしさがわかった。','ごんは本当はやさしいきつねだと思った。','ごんの気持ちが少しむずかしかった。','兵十に栗をとどけたところが好きです。','ごんの気持ちになって考えてみた。','','','ごんと兵十がわかり合えたらよかったのにと思った。'];
+const E=['◎','○','△','◎','○','','','○'];
+let S,D;
+function mkPeriod(date,goal){return{date,goal,eval:true,format:'しるし',point:'',links:'',check:false,peer:true,peerMode:'匿名',progress:false}}
+function genRecs(pend,seed){const o=[];NAMES.forEach((n,i)=>{const t=G[(i+seed)%8];o.push({name:n,reflection:t,eval:['◎','○','△'][(i+seed)%3],comment:pend.includes(i)?'':CM[(i+seed)%8],absent:false,link:''})});return o}
+function initData(){
+ D={classes:[{cls:'4年1組',subject:'国語',role:'担任'},{cls:'4年1組',subject:'算数',role:'担任'},{cls:'4年1組',subject:'理科',role:'担任'},{cls:'4年2組',subject:'外国語',role:'専科'},{cls:'4年2組',subject:'音楽',role:'専科'},{cls:'5年1組',subject:'家庭科',role:'専科'}],units:{},prompts:[
+  {name:'共通・基本のコメント',subject:'',grades:[],purpose:'励ましを中心に、50〜80文字で返す',body:'あなたは小学校の先生です。児童のふりかえりに、励ましを中心に50〜80文字でコメントを返してください。\n出力は1人1行、「名前(タブ)コメント」の形で、未記入の児童も飛ばさず1行返してください。'},
+  {name:'家庭科用のコメント',subject:'家庭科',grades:['5年','6年'],purpose:'技能面と生活への活用の視点',body:'あなたは家庭科の先生です。技能面と、生活への活用の視点を入れて、50〜80文字でコメントを返してください。\n出力は1人1行、「名前(タブ)コメント」の形です。'}],removed:[]};
+ const k1='4年1組|国語';
+ const r1={1:genRecs([],0),2:genRecs([],1),3:NAMES.map((n,i)=>({name:n,reflection:T3[i],eval:E[i],comment:[3,4,7].includes(i)?CM[i]:'',absent:i==6,link:i==0?'スライド':''})),4:NAMES.map(n=>({name:n,reflection:'',eval:'',comment:'',absent:false,link:''}))};
+ D.units[k1]=[{name:'ごんぎつね',goals:'',periods:[mkPeriod('2026-10-21','物語のじょうけいをつかもう'),mkPeriod('2026-10-23','ごんのぎもんを見つけよう'),mkPeriod('2026-10-28','ごんの気持ちを考えよう'),mkPeriod('2026-10-30','ごんと兵十の関係をまとめよう')],recs:r1}];
+ D.units['4年2組|外国語']=[{name:'Unit 4',goals:'',periods:[mkPeriod('2026-10-14','数をたずねよう'),mkPeriod('2026-10-28','ものの数を答えよう')],recs:{1:genRecs([],2),2:genRecs([0,1],3)}}];
+ [['4年1組|算数','わり算'],['4年1組|理科','ものの温度'],['4年2組|音楽','合奏'],['5年1組|家庭科','ミシン']].forEach(([k,u],j)=>{D.units[k]=[{name:u,goals:'',periods:[mkPeriod('2026-10-16','学習のめあて1'),mkPeriod('2026-10-23','学習のめあて2')],recs:{1:genRecs([],j),2:genRecs([],j+1)}}]});
+}
+function reset(){initData();S={view:'home',key:null,tab:'goal',ui:0,period:1,manual:false,drafts:{},gem:'',pasted:'',review:null,detail:false,addRole:'担任',addClasses:['4年2組'],addClass:'4年2組',addSubject:'算数',confirm:null,q:'',fs:'',fg:'',pquery:'',pform:{name:'',subject:'',grades:[],purpose:'',body:''},editP:null,stu:0,newUnit:'',copySrc:'',ask:'',askOut:'',confirmP:null,help:null}}
+reset();
+const keyOf=c=>c.cls+'|'+c.subject;
+const unitsOf=k=>D.units[k]||(D.units[k]=[{name:'（単元を作成してください）',goals:'',periods:[mkPeriod('','')],recs:{}}]);
+const curUnit=()=>unitsOf(S.key)[Math.min(S.ui,unitsOf(S.key).length-1)];
+const recsOf=(u,p)=>{if(!u.recs[p])u.recs[p]=NAMES.map(n=>({name:n,reflection:'',eval:'',comment:'',absent:false,link:''}));return u.recs[p]};
+const isPend=r=>!r.absent&&r.reflection&&!r.comment;
+const pendOfUnit=u=>Object.keys(u.recs).reduce((a,p)=>a+u.recs[p].filter(isPend).length,0);
+const pendOfKey=k=>(D.units[k]||[]).reduce((a,u)=>a+pendOfUnit(u),0);
+const pendTotal=()=>D.classes.reduce((a,c)=>a+pendOfKey(keyOf(c)),0);
+function toast(m){const t=document.getElementById('toast');t.innerHTML='<div class="toast">'+esc(m)+'</div>';clearTimeout(toast.h);toast.h=setTimeout(()=>t.innerHTML='',2400)}
+function clip(text){try{navigator.clipboard.writeText(text).then(()=>toast('コピーしました'),()=>toast('コピーできませんでした。下の欄から全選択してください'))}catch(e){toast('コピーできませんでした。下の欄から全選択してください')}}
+const BEAR='<svg class="mas" viewBox="0 0 100 110"><ellipse cx="50" cy="104" rx="26" ry="5" fill="rgba(0,0,0,.14)"/><ellipse cx="37" cy="99" rx="10" ry="6" fill="#C99A6B" stroke="#6b5646" stroke-width="1.6"/><ellipse cx="63" cy="99" rx="10" ry="6" fill="#C99A6B" stroke="#6b5646" stroke-width="1.6"/><ellipse cx="50" cy="82" rx="22" ry="19" fill="#C99A6B" stroke="#6b5646" stroke-width="1.6"/><ellipse cx="50" cy="86" rx="12" ry="12" fill="#F3E0C7"/><circle cx="22" cy="26" r="11" fill="#C99A6B" stroke="#6b5646" stroke-width="1.6"/><circle cx="78" cy="26" r="11" fill="#C99A6B" stroke="#6b5646" stroke-width="1.6"/><ellipse cx="50" cy="48" rx="34" ry="30" fill="#C99A6B" stroke="#6b5646" stroke-width="1.6"/><ellipse cx="50" cy="58" rx="12" ry="9" fill="#F3E0C7"/><ellipse cx="50" cy="54" rx="3.4" ry="2.4" fill="#4a3a33"/><circle cx="38" cy="49" r="3.4" fill="#3b2f2a"/><circle cx="62" cy="49" r="3.4" fill="#3b2f2a"/><ellipse cx="29" cy="58" rx="6" ry="3.8" fill="#FFADB5" opacity=".75"/><ellipse cx="71" cy="58" rx="6" ry="3.8" fill="#FFADB5" opacity=".75"/></svg>';
+const hdr=(back)=>`<div class="bar"><div class="logo" data-act="home">📒 ふりかえりシート</div><div class="rt">${back?'<button class="back" data-act="home">← ホームへ戻る</button>':'<button class="mini" data-act="guide">❓ 使い方ガイド</button><button class="mini" data-act="ask">💬 質問する</button><div class="who">○○先生</div>'}</div></div>`;
+// ---------- views
+function vHome(){
+ const pt=pendTotal();
+ const byCls={};D.classes.forEach(c=>(byCls[c.cls]=byCls[c.cls]||[]).push(c));
+ const clsNames=Object.keys(byCls).sort();
+ const multi=MULTI.includes(S.addRole);
+ return hdr(false)+`<div class="greet">${BEAR}<div class="bub">お疲れさまです。${pt?`<b>コメント待ちの児童が${pt}人</b>います。`:'コメント待ちの児童は、いません。'}</div><div class="chips"><span class="chip ${pt?'red':''}">💌 コメント待ち ${pt}人</span><span class="chip">📝 本日の記入 38人</span><span class="chip">📅 本日の授業 3コマ</span></div></div>
+ ${clsNames.length?`<div class="grid">${clsNames.map(cn=>{const roles=[...new Set(byCls[cn].map(c=>c.role))];return `<div class="cls"><h3>${esc(cn)} <small>${esc(roles[0])}</small></h3>${byCls[cn].map(c=>{const k=keyOf(c),u=unitsOf(k)[0],pn=pendOfKey(k),th=SUBJ[c.subject]||['📘','#eee'];return `<button class="sj" style="background:${th[1]}" data-act="open" data-k="${esc(k)}">${th[0]} ${esc(c.subject)}${pn?`<span class="bd">あと${pn}人</span>`:''}<small>${esc(u.name)} ${u.periods.length}時間</small></button>`}).join('')}</div>`}).join('')}</div>`:'<div class="card">まだ授業が登録されていません。下の「授業を追加」から登録してください。</div>'}
+ <div class="botrow">
+  <div class="card"><div class="lbl" style="font-size:13px">➕ 授業を追加</div>
+   <div class="addrow"><div class="fld"><div class="lbl">役割</div><select data-in="addRole">${['担任','専科','教科担任制','特別支援','通級'].map(r=>`<option ${r==S.addRole?'selected':''}>${r}</option>`).join('')}</select></div>
+   ${multi?'':`<div class="fld"><div class="lbl">クラス</div><select data-in="addClass">${ALLCLS.map(c=>`<option ${c==S.addClass?'selected':''}>${c}</option>`).join('')}</select></div>`}
+   <div class="fld"><div class="lbl">教科</div><select data-in="addSubject">${Object.keys(SUBJ).map(s=>`<option ${s==S.addSubject?'selected':''}>${s}</option>`).join('')}</select></div>
+   <button class="btn" data-act="addCourse">追加</button></div>
+   ${multi?`<div class="lbl" style="margin-top:8px">担当するクラス(複数選べます)</div><div class="pg">${ALLCLS.map(c=>`<button data-act="togAddCls" data-c="${c}" class="${S.addClasses.includes(c)?'on':''}">${c}</button>`).join('')}</div>`:''}
+   <div style="display:flex;margin-top:8px"><span class="hint" style="margin:0">専科・教科担任制・特別支援・通級は、クラスを複数選べます。</span><button class="btn w sm red" style="margin-left:auto" data-act="remove">授業を削除</button></div></div>
+  <div class="card"><div class="lbl" style="font-size:13px">📚 プロンプトライブラリ</div><div style="font-size:12px;line-height:1.6;margin:2px 0 8px">先生方が共有しているプロンプトの一覧を見たり、登録したりできます。</div><button class="btn" data-act="library">ライブラリを開く</button></div>
+ </div>`}
+function periodPicker(u){return `<div class="per">${u.periods.map((p,i)=>{const n=i+1,pn=(u.recs[n]||[]).filter(isPend).length;return `<button data-act="per" data-n="${n}" class="${S.period==n?'on':''}">${n}${pn?`<span class="bd">${pn}</span>`:''}</button>`}).join('')}<button data-act="addPeriod" title="時数を追加">＋</button></div>`}
+function vClass(){
+ const [cls,subject]=S.key.split('|'),us=unitsOf(S.key),u=curUnit(),role=(D.classes.find(c=>keyOf(c)==S.key)||{}).role||'担任';
+ const th=SUBJ[subject]||['📘','#eee'];
+ if(S.period>u.periods.length)S.period=1;
+ const pn=pendOfUnit(u);
+ const tabs=[['goal','✏️ めあて',0],['records','📝 ふりかえり',pn],['traj','🧭 学びを見る',0],['settings','⚙️ 単元の設定',0]];
+ return hdr(true)+`<div class="hd"><h2>${th[0]} ${esc(cls)} ${esc(subject)}</h2><select data-in="unit">${us.map((x,i)=>`<option value="${i}" ${i==S.ui?'selected':''}>単元:${esc(x.name)}</option>`).join('')}</select></div>
+ <div class="tabs">${tabs.map(([k,l,b])=>`<button class="tab ${S.tab==k?'on':''}" data-act="tab" data-t="${k}">${l}${b?`<span class="bd">あと${b}人</span>`:''}</button>`).join('')}</div>
+ ${S.tab=='goal'?vGoal(u,role):S.tab=='records'?vRecords(u):S.tab=='traj'?vTraj(u):vSettings(u,role,subject)}`}
+function vGoal(u,role){const p=u.periods[S.period-1];
+ return `<div class="card" style="margin-top:0"><div class="lbl">⏱ 時数</div>${periodPicker(u)}</div>
+ <div class="two"><div class="card"><div class="lbl">📅 授業日</div><input type="date" data-in="pdate" value="${esc(p.date)}"><div class="hint">指定した日以降になるまで、児童にはこの時間が表示されません。</div></div>
+ <div class="card"><label class="chk" style="margin-top:0"><input type="checkbox" data-in="peval" ${p.eval?'checked':''}> この時間は自己評価を設定する</label>${p.eval?`<div class="lbl" style="margin-top:8px">評価の形式</div><select data-in="pformat">${[['しるし','しるし(◎・○・△)'],['5段階','5段階(5〜1)'],['ABC','ABC']].map(([v,l])=>`<option value="${v}" ${p.format==v?'selected':''}>${l}</option>`).join('')}</select>`:''}</div></div>
+ <div class="card"><div class="lbl">🎯 本時のめあて</div><textarea rows="2" data-in="pgoal" placeholder="この時間のめあてを入力">${esc(p.goal)}</textarea></div>
+ <details class="det" ${S.detail?'open':''} data-det="1"><summary>⋯ 詳細設定(ふりかえりのポイント・課題リンクなど。ふだんは閉じておけます)</summary>
+  <div class="fld"><div class="lbl">ふりかえりのポイント(任意)</div><textarea rows="2" data-in="ppoint" placeholder="例:友達の意見から学んだことも書いてみよう">${esc(p.point)}</textarea></div>
+  <div class="fld"><div class="lbl">課題リンク(任意・1行に1つ)</div><textarea rows="2" data-in="plinks" placeholder="スライドなどのURLを貼ります">${esc(p.links)}</textarea></div>
+  <label class="chk"><input type="checkbox" data-in="pcheck" ${p.check?'checked':''}> 児童に1つずつチェックさせる(自由進度学習用)</label>
+  <label class="chk"><input type="checkbox" data-in="ppeer" ${p.peer?'checked':''}> 他の児童のふりかえりを見せる(参考にできるようにする)</label>
+  ${p.peer?`<select data-in="ppeermode" style="margin-top:6px"><option value="匿名" ${p.peerMode=='匿名'?'selected':''}>匿名(誰が書いたか分からない形)</option><option value="実名" ${p.peerMode=='実名'?'selected':''}>実名(名前を出して見せる)</option></select>`:''}
+  <label class="chk"><input type="checkbox" data-in="pprog" ${p.progress?'checked':''}> クラスの進み具合を名前つきで見せる(書けた/まだ)</label>
+ </details>
+ <div class="btns"><button class="btn" data-act="saveGoal">クラス全員に設定</button><button class="btn w" data-act="pushGrade">📤 同学年の他クラスにもこの時間の内容を反映</button></div>
+ <div class="hint">専科・教科担任制で、同じ授業を複数のクラスでするときに使います。先に「クラス全員に設定」でこのクラスに保存してから使ってください。</div>`}
+function vRecords(u){
+ const recs=recsOf(u,S.period),sorted=[...recs].sort((a,b)=>(isPend(a)?0:1)-(isPend(b)?0:1));
+ const target=recs.filter(r=>!r.absent);
+ const idx=n=>NAMES.indexOf(n);
+ let h=`<div class="card" style="margin-top:0"><div class="lbl">時数を選択</div>${periodPicker(u)}</div>
+ <div class="card"><div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;flex-wrap:wrap"><span class="ttl" style="margin:0">ふりかえり一覧(第${S.period}時)</span>${S.manual?'':`<button class="btn w sm" style="margin-left:auto" data-act="manual">✏️ 自分でコメントを書く(一覧でまとめて)</button>`}</div>`;
+ if(S.manual){
+  h+=`<div class="hint" style="margin-bottom:8px">各児童のふりかえりと自己評価を見ながら、そのままコメントを書けます。「まとめて保存する」を押すまでは、反映されません。</div>`+recs.map((r,i)=>`<div class="row ${r.absent?'abs':''}"><div class="av" style="background:${AVC[idx(r.name)]}">${r.name[0]}</div><div class="rb"><div class="nm">${r.name}さん${r.absent?'<span class="st n">欠席</span>':''}</div><div class="tx">ふりかえり:${esc(r.reflection||'(未記入)')}　自己評価:${r.eval||'-'}</div><textarea rows="2" data-in="draft" data-i="${i}" placeholder="この子へのコメントを書く">${esc(S.drafts[i]!=null?S.drafts[i]:'')}</textarea></div></div>`).join('')+`<div class="btns"><button class="btn" data-act="saveManual">まとめて保存する</button><button class="btn w" data-act="cancelManual">キャンセル</button></div>`;
+ }else{
+  h+=sorted.map(r=>{const i=recs.indexOf(r),pd=isPend(r);return `<div class="row ${pd?'pend':''} ${r.absent?'abs':''}"><div class="av" style="background:${AVC[idx(r.name)]}">${r.name[0]}</div><div class="rb"><div class="nm">${r.name}さん ${r.eval?`<span style="font-size:16px">${r.eval}</span>`:''}${pd?'<span class="st p">💌 コメント待ち</span>':r.comment?'<span class="st d">✓ コメントあり</span>':(!r.reflection&&!r.absent?'<span class="st n">未記入</span>':'')}${r.link?`<span class="st" style="background:#E3EEFA;color:#3a6ea5">📎 ${esc(r.link)}</span>`:''}<label class="ab"><input type="checkbox" data-in="absent" data-i="${i}" ${r.absent?'checked':''}>欠席</label></div>
+  ${r.reflection?`<div class="tx">${esc(r.reflection)}<span class="cnt">(${r.reflection.length}文字)</span></div>`:''}
+  ${S.editC==i+'|'+S.period?`<textarea rows="2" data-in="editText" style="margin-top:6px">${esc(S.editText)}</textarea><div class="btns" style="margin-top:6px"><button class="btn sm" data-act="saveEdit" data-i="${i}">保存する</button><button class="btn w sm" data-act="cancelEdit">キャンセル</button></div>`:(r.comment?`<div class="cm">💬 ${esc(r.comment)}</div>`:'')}</div>
+  ${r.comment&&S.editC!=i+'|'+S.period?`<button class="btn w sm" data-act="editC" data-i="${i}">編集</button>`:''}</div>`}).join('');
+ }
+ h+='</div>';
+ if(!S.manual){
+  h+=`<div class="card"><div class="ttl">🤖 Geminiでコメントをまとめて作る</div><div class="hint" style="margin:0 0 6px">プロンプトはGem側に登録済みという前提です。</div>
+  <div class="steps"><div class="stp"><b>① コピー</b>この時間の児童のふりかえりを、ボタンでコピーします。(名前とふりかえりが、1人1行)<button class="btn sm" style="margin-top:8px" data-act="copyGem">📋 児童のふりかえりをコピー</button></div>
+  <div class="stp"><b>② Geminiで作る</b>登録済みのGemに貼り付けて、返ってきた回答をコピーします。(このアプリの外での作業です)</div>
+  <div class="stp"><b>③ 貼り付けて反映</b>回答を貼り付け →「内容を確認する」→ 確認・編集 →「この内容で反映する」</div></div>
+  ${S.gem?`<div class="fld"><div class="lbl">↓ うまくコピーできない場合は、ここをクリックして全選択してください</div><textarea rows="5" readonly data-sel="1">${esc(S.gem)}</textarea></div>`:''}
+  <div class="fld"><div class="lbl">Geminiの回答を貼り付け</div><textarea rows="4" data-in="pasted" placeholder="Geminiの回答(名前とコメントがタブ区切り)をそのまま貼り付けてください">${esc(S.pasted)}</textarea></div>
+  <div class="btns"><button class="btn" data-act="parse" ${S.pasted?'':'disabled'}>内容を確認する</button><button class="btn w sm" data-act="sampleReply" title="デモ用">デモ用:サンプルの回答を入れる</button></div>
+  ${S.warn?`<div class="hint" style="color:#b33;font-weight:700">${esc(S.warn)}</div>`:''}
+  ${S.review?`<div class="rev"><div class="lbl">反映前の確認・編集</div><div class="hint" style="margin:0 0 8px">コピーしたときと同じ並び順で、一覧の児童とそのまま対応させています。内容を確認し、必要ならその場で直してから反映してください。</div>${S.review.map((it,i)=>`<div class="it"><b>${it.name}さん</b>${!it.feedback.trim()?'<span class="cnt">(返信なし:今のコメントはそのまま残ります)</span>':''}<textarea rows="2" data-in="rev" data-i="${i}">${esc(it.feedback)}</textarea></div>`).join('')}<div class="btns"><button class="btn" data-act="apply">この内容で反映する</button><button class="btn w" data-act="cancelReview">キャンセル</button></div></div>`:''}</div>`;
+ }
+ return h}
+function vTraj(u){
+ const si=S.stu;
+ return `<div class="card" style="margin-top:0"><div class="ttl">🧭 この単元の学びを見る</div><div class="hint" style="margin:0 0 8px">1人の児童の記録を、時系列で見られます。評価ではなく、先生が学びの様子を確かめるための画面です。</div>
+ <div class="pg">${NAMES.map((n,i)=>`<button data-act="stu" data-i="${i}" class="${si==i?'on':''}">${n}</button>`).join('')}</div>
+ <div class="tl">${u.periods.map((p,i)=>{const r=(u.recs[i+1]||[])[si];if(!r||(!r.reflection&&!r.absent))return `<div class="it"><b>第${i+1}時 ${esc(p.date)}</b><div class="hint">${esc(p.goal||'(めあて未設定)')}</div><div class="hint">まだ記録がありません</div></div>`;return `<div class="it"><b>第${i+1}時 ${esc(p.date)}</b> <span>${r.eval||''}</span><div class="hint">🎯 ${esc(p.goal)}</div>${r.absent?'<div class="tx">(欠席)</div>':`<div class="tx">${esc(r.reflection)}</div>`}${r.comment?`<div class="cm">💬 ${esc(r.comment)}</div>`:''}</div>`}).join('')}</div></div>`}
+function vSettings(u,role,subject){
+ const others=Object.keys(D.units).filter(k=>k!=S.key&&k.split('|')[1]==subject);
+ return `<div class="card" style="margin-top:0"><div class="ttl">新しい単元を作成</div><input type="text" data-in="newUnit" value="${esc(S.newUnit)}" placeholder="例:大きな数のしくみ"><div class="btns"><button class="btn" data-act="mkUnit">この単元を作成して切り替える</button></div></div>
+ <div class="card"><div class="ttl">他クラスの単元をコピー(同学年・同教科のみ)</div>${others.length?`<select data-in="copySrc"><option value="">選択してください</option>${others.map(k=>`<option value="${esc(k)}" ${S.copySrc==k?'selected':''}>${esc(k.split('|')[0])}:${esc(D.units[k][0].name)}</option>`).join('')}</select><div class="btns"><button class="btn w" data-act="copyUnit" ${S.copySrc?'':'disabled'}>この単元をコピーする</button></div>`:'<div class="hint">同学年・同教科でコピーできる単元が、まだありません。</div>'}</div>
+ <div class="card"><div class="ttl">学習のゴール・評価の観点(任意)</div><div class="hint" style="margin:0 0 6px">この単元で児童にどんな学びが生まれてほしいかのメモです。A・B・Cのような判定には使いません。</div><textarea rows="3" data-in="goals" placeholder="例:・○○について理解する">${esc(u.goals)}</textarea><div class="btns"><button class="btn" data-act="saveGoals">学習のゴールを保存</button></div></div>
+ ${(role=='特別支援'||role=='通級')?`<div class="card"><div class="ttl">対象児童</div><div class="hint" style="margin:0 0 6px">この授業の対象にする児童を選びます。</div><div class="pg">${NAMES.map(n=>`<button class="${S.tg&&S.tg.includes(n)?'on':''}" data-act="tgt" data-n="${n}">${n}</button>`).join('')}</div></div>`:''}`}
+function vLib(){
+ const q=S.pquery.trim(),list=D.prompts.map((p,i)=>({p,i})).filter(({p})=>(!q||(p.name+p.purpose).includes(q))&&(!S.fs||p.subject==S.fs)&&(!S.fg||p.grades.includes(S.fg)));
+ const f=S.pform;
+ return hdr(true)+`<div class="card warn" style="margin-top:0"><div class="ttl">⚠ 新しいプロンプトを作るときに必ず守ること</div><div style="font-size:13px;line-height:1.8">プロンプトの中身(褒め方や視点)は自由に工夫できます。ただし、出力の形式だけは必ず守るよう指示してください。<ul style="margin:6px 0 0;padding-left:20px"><li><b>1人につき必ず1行</b>、コピーした児童の人数分だけ出力する</li><li><b>タブ区切り</b>で「名前(タブ)コメント」の形にする</li><li>できれば <b>\`\`\`text ～ \`\`\`</b> のコードブロックで囲む</li><li><b>未記入の児童も飛ばさず、必ず1行返す</b>(人数がずれると、全員分の反映が止まります)</li></ul></div></div>
+ <div class="card"><div class="ttl">📚 プロンプトライブラリ</div><div class="hint" style="margin:0 0 8px">先生方が作成・共有しているプロンプトの一覧です。</div>
+ <div class="two"><input type="text" data-in="pquery" value="${esc(S.pquery)}" placeholder="🔍 名称・目的で検索"><div style="display:flex;gap:8px"><select data-in="fs"><option value="">教科:すべて</option>${Object.keys(SUBJ).map(s=>`<option ${S.fs==s?'selected':''}>${s}</option>`).join('')}</select><select data-in="fg"><option value="">学年:すべて</option>${['1年','2年','3年','4年','5年','6年'].map(s=>`<option ${S.fg==s?'selected':''}>${s}</option>`).join('')}</select></div></div>
+ ${list.length?list.map(({p,i})=>`<div class="pr"><div class="prh"><b>${esc(p.name)}</b><span class="mini2">${esc(p.subject||'指定なし')}</span><span class="mini2">${p.grades.length?esc(p.grades.join('・')):'全学年'}</span></div><div class="hint" style="margin:4px 0 8px">${esc(p.purpose)}</div>
+ ${S.editP===i?`<textarea rows="5" data-in="editPBody">${esc(S.editPBody)}</textarea><div class="btns" style="margin-top:6px"><button class="btn sm" data-act="saveP" data-i="${i}">保存する</button><button class="btn w sm" data-act="cancelP">キャンセル</button></div>`:`<div class="btns" style="margin:0"><button class="btn w sm" data-act="copyP" data-i="${i}">📋 コピー</button><button class="btn w sm" data-act="editP" data-i="${i}">✏️ 編集</button>${S.confirmP===i?`<span class="hint" style="margin:0">本当に削除しますか?</span><button class="btn w sm red" data-act="delP" data-i="${i}">削除する</button><button class="btn w sm" data-act="noDelP">やめる</button>`:`<button class="btn w sm red" data-act="askDelP" data-i="${i}">削除</button>`}</div>`}</div>`).join(''):'<div class="hint">条件に合うプロンプトがありません。</div>'}</div>
+ <div class="card"><div class="ttl">＋ 新しいプロンプトを登録</div><div class="two"><div class="fld"><div class="lbl">名称(自由に決めてください)</div><input type="text" data-in="pf_name" value="${esc(f.name)}" placeholder="例:○○式・家庭科用のコメント"></div><div class="fld"><div class="lbl">教科</div><select data-in="pf_subject"><option value="">(指定なし・汎用)</option>${Object.keys(SUBJ).map(s=>`<option ${f.subject==s?'selected':''}>${s}</option>`).join('')}</select></div></div>
+ <div class="fld"><div class="lbl">学年(複数選択可・任意)</div><div class="pg">${['1年','2年','3年','4年','5年','6年'].map(g=>`<button data-act="pfg" data-g="${g}" class="${f.grades.includes(g)?'on':''}">${g}</button>`).join('')}</div></div>
+ <div class="fld"><div class="lbl">教科・目的(補足)</div><input type="text" data-in="pf_purpose" value="${esc(f.purpose)}" placeholder="例:低学年向け/励ましつき"></div>
+ <div class="fld"><div class="lbl">プロンプト本文</div><textarea rows="5" data-in="pf_body" placeholder="Gemに渡すプロンプトの本文をそのまま貼り付けてください">${esc(f.body)}</textarea></div>
+ <div class="btns"><button class="btn" data-act="regP">登録する</button></div></div>`}
+function vAsk(){return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">❓ 質問する</div><div class="hint" style="margin:0 0 8px">使い方で分からないことを自由に書いてください。アプリの説明といっしょにコピーされるので、いつものようにGeminiに貼り付ければ、答えが返ってきます。</div><div class="lbl">質問</div><textarea rows="4" data-in="ask" placeholder="例:課題リンクにチェックを付けさせたいけど、どこで設定するの?">${esc(S.ask)}</textarea><div class="btns"><button class="btn" data-act="copyAsk">質問をコピーする</button></div>${S.askOut?`<div class="fld"><div class="lbl">コピーされる内容(うまくコピーできないときは、ここから全選択)</div><textarea rows="6" readonly data-sel="1">${esc(S.askOut)}</textarea></div>`:''}</div>`}
+function vGuide(){return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">❓ 使い方ガイド</div><div class="lbl">🎬 3分で分かる操作デモ</div><div class="demo-box">(操作デモの動画がここに入ります)</div><div class="lbl" style="margin-top:14px">🔰 初めての方はここから(4ステップ)</div><div class="gd"><div class="gc"><b>① 授業を追加</b><span>ホームから、自分のクラスと教科を登録</span></div><div class="gc"><b>② 単元を作る</b><span>クラスを開いて、単元名を入力</span></div><div class="gc"><b>③ めあてを設定</b><span>時数ごとに入力して「クラス全員に設定」</span></div><div class="gc"><b>④ 児童にURLを伝える</b><span>児童がログインすれば、自分のクラスが出ます</span></div></div></div>
+ <div class="card"><div class="ttl">✨ あると便利な機能</div><div class="gd">${[['🚫 欠席チェック','欠席の児童を評価対象外にできる'],['✏️ 自分でまとめて書く','AIを使わず、一覧を見ながらコメントを書ける'],['🤖 Geminiでコメント','コピー→Gemに貼り付け→確認→反映'],['📚 プロンプトライブラリ','先生同士でプロンプトを共有・検索'],['📤 同学年へ反映','他クラスにめあてを一括コピー'],['🧭 学びの軌跡','1人の児童の記録を時系列で見られる'],['👀 みんなのふりかえり','他の児童のふりかえりを匿名/実名で見せられる'],['🔍 児童プレビュー','児童から見た画面を確認(テスト用)']].map(([a,b])=>`<div class="gc w"><b>${a}</b><span>${b}</span></div>`).join('')}</div></div>`}
+function vRemove(){return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">授業を削除</div><div class="hint" style="margin:0 0 8px">削除したいクラスと教科を選んでください。単元やふりかえりなどのデータは消えません。間違えて削除しても、同じクラスと教科でもう一度登録すれば、元どおり使えます。</div>${D.classes.length?D.classes.map((c,i)=>`<div class="row"><div class="rb"><b>${esc(c.cls)}</b>　${esc(c.subject)}<span class="cnt">(${esc(c.role)})</span></div>${S.confirm===i?`<span class="hint" style="margin:0">本当に削除しますか?</span><button class="btn w sm red" data-act="doRemove" data-i="${i}">削除する</button><button class="btn w sm" data-act="noRemove">やめる</button>`:`<button class="btn w sm red" data-act="askRemove" data-i="${i}">削除する</button>`}</div>`).join(''):'<div class="hint">登録されている授業がありません。</div>'}</div>`}
+function render(){
+ const app=document.getElementById('app'),sc=window.scrollY;
+ app.innerHTML=S.view=='home'?vHome():S.view=='class'?vClass():S.view=='lib'?vLib():S.view=='ask'?vAsk():S.view=='guide'?vGuide():vRemove();
+ window.scrollTo(0,sc)}
+// ---------- events
+const go=v=>{S.view=v;window.scrollTo(0,0);render()};
+const P=()=>curUnit().periods[S.period-1];
+const A={
+ reset:()=>{reset();render();toast('最初の状態に戻しました')},
+ home:()=>go('home'),guide:()=>go('guide'),ask:()=>go('ask'),library:()=>go('lib'),remove:()=>go('remove'),
+ open:d=>{S.key=d.k;S.tab='goal';S.ui=0;S.period=1;S.manual=false;S.review=null;S.gem='';S.pasted='';S.warn='';go('class')},
+ tab:d=>{S.tab=d.t;S.manual=false;S.review=null;render()},
+ per:d=>{S.period=+d.n;S.manual=false;S.review=null;S.gem='';S.pasted='';S.warn='';render()},
+ addPeriod:()=>{const u=curUnit();u.periods.push(mkPeriod('',''));S.period=u.periods.length;render();toast(S.period+'時間めを追加しました')},
+ saveGoal:()=>toast('クラス全員に設定しました'),
+ pushGrade:()=>toast('同学年の他クラスに、この時間の内容を反映しました'),
+ togAddCls:d=>{const i=S.addClasses.indexOf(d.c);if(i<0)S.addClasses.push(d.c);else S.addClasses.splice(i,1);render()},
+ addCourse:()=>{const cl=MULTI.includes(S.addRole)?S.addClasses:[S.addClass];if(!cl.length){toast('クラスを選んでください');return}let n=0;cl.forEach(c=>{if(!D.classes.some(x=>x.cls==c&&x.subject==S.addSubject)){D.classes.push({cls:c,subject:S.addSubject,role:S.addRole});unitsOf(c+'|'+S.addSubject);n++}});toast(n?n+'件の授業を追加しました':'すでに登録されています');render()},
+ askRemove:d=>{S.confirm=+d.i;render()},noRemove:()=>{S.confirm=null;render()},
+ doRemove:d=>{D.classes.splice(+d.i,1);S.confirm=null;render();toast('授業を削除しました(データは残っています)')},
+ manual:()=>{S.manual=true;S.drafts={};render()},cancelManual:()=>{S.manual=false;render()},
+ saveManual:()=>{const rec=recsOf(curUnit(),S.period);let n=0;Object.keys(S.drafts).forEach(i=>{const t=(S.drafts[i]||'').trim();if(t){rec[i].comment=t;n++}});S.manual=false;render();toast(n+'件のコメントを保存しました')},
+ editC:d=>{const r=recsOf(curUnit(),S.period)[+d.i];S.editC=d.i+'|'+S.period;S.editText=r.comment;render()},
+ cancelEdit:()=>{S.editC=null;render()},
+ saveEdit:d=>{recsOf(curUnit(),S.period)[+d.i].comment=S.editText.trim();S.editC=null;render();toast('コメントを保存しました')},
+ copyGem:()=>{const rec=recsOf(curUnit(),S.period).filter(r=>!r.absent);if(!rec.some(r=>r.reflection)){toast('まだコピーできる内容がありません');return}S.gem=rec.map(r=>r.name+'\t'+(r.reflection||'(未記入)')).join('\n');clip(S.gem);render()},
+ sampleReply:()=>{const rec=recsOf(curUnit(),S.period).filter(r=>!r.absent);S.pasted='```text\n'+rec.map((r,i)=>r.name+'\t'+(r.reflection?CM[(i+2)%8]:'')).join('\n')+'\n```';S.warn='';render()},
+ parse:()=>{let t=S.pasted.trim();const m=t.match(/```[a-zA-Z]*\n([\s\S]*?)```/);if(m)t=m[1].trim();const target=recsOf(curUnit(),S.period).filter(r=>!r.absent);const lines=t.split('\n').map(l=>l.trim()).filter(l=>l);S.warn='';if(!lines.length){S.warn='回答の行が見つかりませんでした。貼り付けた内容を確認してください。';render();return}if(lines.length!=target.length)S.warn=`件数が一致しません(この時間の対象児童は${target.length}人、Geminiの回答は${lines.length}行)。内容をよく確認してから反映してください。`;S.review=target.map((r,i)=>{const line=lines[i]||'',ti=line.indexOf('\t');let fb;if(ti!=-1)fb=line.slice(ti+1).trim();else{const c=line.replace(/[\s　]/g,'');fb=(c==r.name||c.length<=8)?'':line}return{name:r.name,feedback:fb}});render()},
+ cancelReview:()=>{S.review=null;render()},
+ apply:()=>{const target=recsOf(curUnit(),S.period).filter(r=>!r.absent);let n=0;S.review.forEach((it,i)=>{if(it.feedback.trim()&&target[i]){target[i].comment=it.feedback.trim();n++}});S.review=null;S.pasted='';S.gem='';S.warn='';render();toast(n+'件のコメントを反映しました')},
+ stu:d=>{S.stu=+d.i;render()},
+ mkUnit:()=>{const n=S.newUnit.trim();if(!n){toast('単元名を入力してください');return}const us=unitsOf(S.key);if(us.length==1&&us[0].name.startsWith('（'))us.length=0;us.push({name:n,goals:'',periods:[mkPeriod('','')],recs:{}});S.ui=us.length-1;S.period=1;S.newUnit='';S.tab='goal';render();toast('単元を作成しました')},
+ copyUnit:()=>{const src=D.units[S.copySrc][0];const us=unitsOf(S.key);if(us.length==1&&us[0].name.startsWith('（'))us.length=0;us.push({name:src.name,goals:src.goals,periods:src.periods.map(p=>({...p})),recs:{}});S.ui=us.length-1;S.period=1;S.copySrc='';S.tab='goal';render();toast('単元をコピーしました(ふりかえりはコピーされません)')},
+ saveGoals:()=>toast('学習のゴールを保存しました'),
+ tgt:d=>{S.tg=S.tg||[...NAMES];const i=S.tg.indexOf(d.n);if(i<0)S.tg.push(d.n);else S.tg.splice(i,1);render()},
+ copyP:d=>clip(D.prompts[+d.i].body),
+ editP:d=>{S.editP=+d.i;S.editPBody=D.prompts[+d.i].body;render()},cancelP:()=>{S.editP=null;render()},saveP:d=>{D.prompts[+d.i].body=S.editPBody;S.editP=null;render();toast('保存しました')},
+ askDelP:d=>{S.confirmP=+d.i;render()},noDelP:()=>{S.confirmP=null;render()},delP:d=>{D.prompts.splice(+d.i,1);S.confirmP=null;render();toast('削除しました')},
+ pfg:d=>{const g=S.pform.grades,i=g.indexOf(d.g);if(i<0)g.push(d.g);else g.splice(i,1);render()},
+ regP:()=>{const f=S.pform;if(!f.name.trim()||!f.body.trim()){toast('名称とプロンプト本文を入力してください');return}D.prompts.push({...f,grades:[...f.grades]});S.pform={name:'',subject:'',grades:[],purpose:'',body:''};render();toast('登録しました')},
+ copyAsk:()=>{if(!S.ask.trim()){toast('質問を入力してください');return}S.askOut='あなたは「ふりかえりシート」というアプリの使い方に詳しいサポート担当です。\n以下のアプリの説明を参考に、先生からの質問に、分かりやすく丁寧に答えてください。\n説明から分からないことは、想像で答えず「この資料からは分かりません」と答えてください。\n\n【アプリの説明】(ここにアプリの説明が入ります)\n\n【先生からの質問】\n'+S.ask;clip(S.askOut);render()}
+};
+document.getElementById('app').addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(a&&A[a.dataset.act]){A[a.dataset.act](a.dataset);return}const s=e.target.closest('[data-sel]');if(s)s.select()});
+document.querySelector('.demo').addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(a&&A[a.dataset.act])A[a.dataset.act](a.dataset)});
+const IN={
+ addRole:v=>{S.addRole=v;render()},addClass:v=>S.addClass=v,addSubject:v=>S.addSubject=v,
+ unit:v=>{S.ui=+v;S.period=1;render()},
+ pdate:v=>P().date=v,pgoal:v=>P().goal=v,ppoint:v=>P().point=v,plinks:v=>P().links=v,ppeermode:v=>P().peerMode=v,pformat:v=>P().format=v,
+ peval:(v,el)=>{P().eval=el.checked;render()},pcheck:(v,el)=>P().check=el.checked,ppeer:(v,el)=>{P().peer=el.checked;S.detail=true;render()},pprog:(v,el)=>P().progress=el.checked,
+ absent:(v,el)=>{recsOf(curUnit(),S.period)[+el.dataset.i].absent=el.checked;S.review=null;render()},
+ draft:(v,el)=>S.drafts[el.dataset.i]=v,editText:v=>S.editText=v,pasted:v=>{S.pasted=v;const b=document.querySelector('[data-act=parse]');if(b)b.disabled=!v},
+ rev:(v,el)=>S.review[+el.dataset.i].feedback=v,
+ newUnit:v=>S.newUnit=v,copySrc:v=>{S.copySrc=v;render()},goals:v=>curUnit().goals=v,
+ pquery:v=>{S.pquery=v;render();const i=document.querySelector('[data-in=pquery]');if(i){i.focus();i.setSelectionRange(v.length,v.length)}},fs:v=>{S.fs=v;render()},fg:v=>{S.fg=v;render()},
+ editPBody:v=>S.editPBody=v,pf_name:v=>S.pform.name=v,pf_subject:v=>S.pform.subject=v,pf_purpose:v=>S.pform.purpose=v,pf_body:v=>S.pform.body=v,ask:v=>S.ask=v
+};
+const SELECTS=['addRole','addClass','addSubject','unit','copySrc','fs','fg','pformat','ppeermode','pf_subject'];
+const CHECKS=['peval','pcheck','ppeer','pprog','absent'];
+document.getElementById('app').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.in;if(!k||!IN[k])return;if(SELECTS.includes(k)||CHECKS.includes(k))return;IN[k](e.target.value,e.target)});
+document.getElementById('app').addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.in;if(!k||!IN[k])return;if(SELECTS.includes(k)||CHECKS.includes(k))IN[k](e.target.value,e.target)});
+document.getElementById('app').addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.det)S.detail=e.target.open},true);
+render();
+</script>
+
+</html>
