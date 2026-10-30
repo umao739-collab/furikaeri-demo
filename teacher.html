@@ -117,15 +117,16 @@ function mkPeriod(date,goal){return{date,goal,eval:true,format:'しるし',point
 function genRecs(pend,seed){const o=[];NAMES.forEach((n,i)=>{const t=G[(i+seed)%8];o.push({name:n,reflection:t,eval:['◎','○','△'][(i+seed)%3],comment:pend.includes(i)?'':CM[(i+seed)%8],absent:false,link:''})});return o}
 function initData(){
  D={classes:[{cls:'4年1組',subject:'国語',role:'担任'},{cls:'4年1組',subject:'算数',role:'担任'},{cls:'4年1組',subject:'理科',role:'担任'},{cls:'4年2組',subject:'外国語',role:'専科'},{cls:'4年2組',subject:'音楽',role:'専科'},{cls:'5年1組',subject:'家庭科',role:'専科'}],units:{},prompts:[
-  {name:'共通・基本のコメント',subject:'',grades:[],purpose:'励ましを中心に、50〜80文字で返す',body:'あなたは小学校の先生です。児童のふりかえりに、励ましを中心に50〜80文字でコメントを返してください。\n出力は1人1行、「名前(タブ)コメント」の形で、未記入の児童も飛ばさず1行返してください。'},
-  {name:'家庭科用のコメント',subject:'家庭科',grades:['5年','6年'],purpose:'技能面と生活への活用の視点',body:'あなたは家庭科の先生です。技能面と、生活への活用の視点を入れて、50〜80文字でコメントを返してください。\n出力は1人1行、「名前(タブ)コメント」の形です。'}],removed:[]};
+  {name:'共通・基本のコメント',subject:'',grades:[],purpose:'励ましを中心に、50〜80文字で返す',owner:'田中先生',shared:true,body:'あなたは小学校の先生です。児童のふりかえりに、励ましを中心に50〜80文字でコメントを返してください。'},
+  {name:'家庭科用のコメント',subject:'家庭科',grades:['5年','6年'],purpose:'技能面と生活への活用の視点',owner:'佐藤先生',shared:true,body:'あなたは家庭科の先生です。技能面と、生活への活用の視点を入れて、50〜80文字でコメントを返してください。'},
+  {name:'低学年向け・やさしい言葉',subject:'',grades:['1年','2年','3年'],purpose:'ひらがな多めで、短く',owner:'あなた',shared:false,body:'あなたは小学校低学年の担任です。ひらがなを多めに、30〜50文字のやさしい言葉で、がんばりを見つけてコメントを返してください。'}],removed:[]};
  const k1='4年1組|国語';
  const r1={1:genRecs([],0),2:genRecs([],1),3:NAMES.map((n,i)=>({name:n,reflection:T3[i],eval:E[i],comment:[3,4,7].includes(i)?CM[i]:'',absent:i==6,link:i==0?'スライド':''})),4:NAMES.map(n=>({name:n,reflection:'',eval:'',comment:'',absent:false,link:''}))};
  D.units[k1]=[{name:'ごんぎつね',goals:'',periods:[mkPeriod('2026-10-21','物語のじょうけいをつかもう'),mkPeriod('2026-10-23','ごんのぎもんを見つけよう'),mkPeriod('2026-10-28','ごんの気持ちを考えよう'),mkPeriod('2026-10-30','ごんと兵十の関係をまとめよう')],recs:r1}];
  D.units['4年2組|外国語']=[{name:'Unit 4',goals:'',periods:[mkPeriod('2026-10-14','数をたずねよう'),mkPeriod('2026-10-28','ものの数を答えよう')],recs:{1:genRecs([],2),2:genRecs([0,1],3)}}];
  [['4年1組|算数','わり算'],['4年1組|理科','ものの温度'],['4年2組|音楽','合奏'],['5年1組|家庭科','ミシン']].forEach(([k,u],j)=>{D.units[k]=[{name:u,goals:'',periods:[mkPeriod('2026-10-16','学習のめあて1'),mkPeriod('2026-10-23','学習のめあて2')],recs:{1:genRecs([],j),2:genRecs([],j+1)}}]});
 }
-function reset(){initData();S={view:'home',key:null,tab:'goal',ui:0,period:1,manual:false,drafts:{},gem:'',pasted:'',review:null,detail:false,addRole:'担任',addClasses:['4年2組'],addClass:'4年2組',addSubject:'算数',confirm:null,q:'',fs:'',fg:'',pquery:'',pform:{name:'',subject:'',grades:[],purpose:'',body:''},editP:null,stu:0,newUnit:'',copySrc:'',ask:'',askOut:'',confirmP:null,help:null}}
+function reset(){initData();S={view:'home',key:null,tab:'goal',ui:0,period:1,manual:false,drafts:{},gem:'',pasted:'',review:null,detail:false,addRole:'担任',addClasses:['4年2組'],addClass:'4年2組',addSubject:'算数',confirm:null,q:'',fs:'',fg:'',pquery:'',pform:{name:'',subject:'',grades:[],purpose:'',body:'',shared:false},editP:null,stu:0,newUnit:'',copySrc:'',ask:'',askOut:'',confirmP:null,help:null,lastP:{}}}
 reset();
 const keyOf=c=>c.cls+'|'+c.subject;
 const unitsOf=k=>D.units[k]||(D.units[k]=[{name:'（単元を作成してください）',goals:'',periods:[mkPeriod('','')],recs:{}}]);
@@ -198,11 +199,13 @@ function vRecords(u){
  }
  h+='</div>';
  if(!S.manual){
-  h+=`<div class="card"><div class="ttl">🤖 Geminiでコメントをまとめて作る</div><div class="hint" style="margin:0 0 6px">プロンプトはGem側に登録済みという前提です。</div>
-  <div class="steps"><div class="stp"><b>① コピー</b>この時間の児童のふりかえりを、ボタンでコピーします。(名前とふりかえりが、1人1行)<button class="btn sm" style="margin-top:8px" data-act="copyGem">📋 児童のふりかえりをコピー</button></div>
-  <div class="stp"><b>② Geminiで作る</b>登録済みのGemに貼り付けて、返ってきた回答をコピーします。(このアプリの外での作業です)</div>
-  <div class="stp"><b>③ 貼り付けて反映</b>回答を貼り付け →「内容を確認する」→ 確認・編集 →「この内容で反映する」</div></div>
-  ${S.gem?`<div class="fld"><div class="lbl">↓ うまくコピーできない場合は、ここをクリックして全選択してください</div><textarea rows="5" readonly data-sel="1">${esc(S.gem)}</textarea></div>`:''}
+  const po=promptOpts(),opts=po.opts,cur=po.cur;
+  h+=`<div class="card"><div class="ttl">🤖 Geminiでコメントをまとめて作る</div><div class="hint" style="margin:0 0 6px">使うプロンプトを選び、児童のふりかえりといっしょにコピーして、Geminiに貼り付けます。</div>
+  <div class="steps"><div class="stp"><b>① プロンプトを選ぶ</b>${opts.length?`<select data-in="pickp" style="margin-top:6px;align-self:stretch;min-width:0">${opts.map(({p})=>`<option value="${esc(p.name)}" ${cur&&cur.p.name==p.name?'selected':''}>${p.shared?'👥':'🔒'} ${esc(p.name)}</option>`).join('')}</select><span class="hint" style="margin:6px 0 0">前回使ったものを、クラス×教科ごとに覚えています。</span>`:'<span class="hint">使えるプロンプトがありません。ホームの「プロンプトライブラリ」で登録してください。</span>'}</div>
+  <div class="stp"><b>② コピー</b>プロンプトと、この時間の児童のふりかえり(名前とふりかえりが1人1行)を、いっしょにコピーします。<button class="btn sm" style="margin-top:8px" data-act="copyGem">📋 プロンプトとふりかえりをコピー</button></div>
+  <div class="stp"><b>③ Geminiに貼り付け</b>Geminiの新しいチャットに貼り付けて、返ってきた回答をコピーします。<a class="btn w sm" href="https://gemini.google.com/app" target="_blank" rel="noopener" style="margin-top:8px;text-decoration:none">Geminiを開く ↗</a></div>
+  <div class="stp"><b>④ 貼り付けて反映</b>回答を貼り付け →「内容を確認する」→ 確認・編集 →「この内容で反映する」</div></div>
+  ${S.gem?`<div class="fld"><div class="lbl">↓ うまくコピーできない場合は、ここをクリックして全選択してください</div><textarea rows="6" readonly data-sel="1">${esc(S.gem)}</textarea></div>`:''}
   <div class="fld"><div class="lbl">Geminiの回答を貼り付け</div><textarea rows="4" data-in="pasted" placeholder="Geminiの回答(名前とコメントがタブ区切り)をそのまま貼り付けてください">${esc(S.pasted)}</textarea></div>
   <div class="btns"><button class="btn" data-act="parse" ${S.pasted?'':'disabled'}>内容を確認する</button><button class="btn w sm" data-act="sampleReply" title="デモ用">デモ用:サンプルの回答を入れる</button></div>
   ${S.warn?`<div class="hint" style="color:#b33;font-weight:700">${esc(S.warn)}</div>`:''}
@@ -220,18 +223,26 @@ function vSettings(u,role,subject){
  <div class="card"><div class="ttl">他クラスの単元をコピー(同学年・同教科のみ)</div>${others.length?`<select data-in="copySrc"><option value="">選択してください</option>${others.map(k=>`<option value="${esc(k)}" ${S.copySrc==k?'selected':''}>${esc(k.split('|')[0])}:${esc(D.units[k][0].name)}</option>`).join('')}</select><div class="btns"><button class="btn w" data-act="copyUnit" ${S.copySrc?'':'disabled'}>この単元をコピーする</button></div>`:'<div class="hint">同学年・同教科でコピーできる単元が、まだありません。</div>'}</div>
  <div class="card"><div class="ttl">学習のゴール・評価の観点(任意)</div><div class="hint" style="margin:0 0 6px">この単元で児童にどんな学びが生まれてほしいかのメモです。A・B・Cのような判定には使いません。</div><textarea rows="3" data-in="goals" placeholder="例:・○○について理解する">${esc(u.goals)}</textarea><div class="btns"><button class="btn" data-act="saveGoals">学習のゴールを保存</button></div></div>
  ${(role=='特別支援'||role=='通級')?`<div class="card"><div class="ttl">対象児童</div><div class="hint" style="margin:0 0 6px">この授業の対象にする児童を選びます。</div><div class="pg">${NAMES.map(n=>`<button class="${S.tg&&S.tg.includes(n)?'on':''}" data-act="tgt" data-n="${n}">${n}</button>`).join('')}</div></div>`:''}`}
+const ME='あなた';
+function visP(){return D.prompts.map((p,i)=>({p,i})).filter(({p})=>p.shared||p.owner==ME)}
+const FMT='\n\n【出力の形式】(アプリが自動で追加します)\n・児童1人につき必ず1行で、下の児童と同じ順に出力する\n・「名前(タブ)コメント」の形(タブ区切り)にする\n・未記入の児童も飛ばさず、必ず1行返す\n・全体を ```text ～ ``` のコードブロックで囲む';
+function promptOpts(){const subj=(S.key||'').split('|')[1]||'',opts=visP().filter(({p})=>!p.subject||p.subject==subj),cur=opts.find(({p})=>p.name==S.lastP[S.key])||opts[0];return{opts,cur}}
 function vLib(){
- const q=S.pquery.trim(),list=D.prompts.map((p,i)=>({p,i})).filter(({p})=>(!q||(p.name+p.purpose).includes(q))&&(!S.fs||p.subject==S.fs)&&(!S.fg||p.grades.includes(S.fg)));
+ const q=S.pquery.trim(),list=visP().filter(({p})=>(!q||(p.name+p.purpose).includes(q))&&(!S.fs||p.subject==S.fs)&&(!S.fg||p.grades.includes(S.fg)));
  const f=S.pform;
- return hdr(true)+`<div class="card warn" style="margin-top:0"><div class="ttl">⚠ 新しいプロンプトを作るときに必ず守ること</div><div style="font-size:13px;line-height:1.8">プロンプトの中身(褒め方や視点)は自由に工夫できます。ただし、出力の形式だけは必ず守るよう指示してください。<ul style="margin:6px 0 0;padding-left:20px"><li><b>1人につき必ず1行</b>、コピーした児童の人数分だけ出力する</li><li><b>タブ区切り</b>で「名前(タブ)コメント」の形にする</li><li>できれば <b>\`\`\`text ～ \`\`\`</b> のコードブロックで囲む</li><li><b>未記入の児童も飛ばさず、必ず1行返す</b>(人数がずれると、全員分の反映が止まります)</li></ul></div></div>
- <div class="card"><div class="ttl">📚 プロンプトライブラリ</div><div class="hint" style="margin:0 0 8px">先生方が作成・共有しているプロンプトの一覧です。</div>
+ const item=({p,i})=>`<div class="pr"><div class="prh"><b>${esc(p.name)}</b>${p.shared?`<span class="mini2" style="background:#D8F2DA">👥 共有・作成:${esc(p.owner)}</span>`:'<span class="mini2" style="background:#E6E0FF">🔒 自分用</span>'}<span class="mini2">${esc(p.subject||'指定なし')}</span><span class="mini2">${p.grades.length?esc(p.grades.join('・')):'全学年'}</span></div><div class="hint" style="margin:4px 0 8px">${esc(p.purpose)}</div>
+ ${S.editP===i?`<textarea rows="5" data-in="editPBody">${esc(S.editPBody)}</textarea><div class="btns" style="margin-top:6px"><button class="btn sm" data-act="saveP" data-i="${i}">保存する</button><button class="btn w sm" data-act="cancelP">キャンセル</button></div>`:`<div class="btns" style="margin:0"><button class="btn w sm" data-act="copyP" data-i="${i}">📋 コピー</button><button class="btn w sm" data-act="editP" data-i="${i}">✏️ 編集</button>${p.shared?`<button class="btn w sm" data-act="dupP" data-i="${i}">🔒 自分用にコピーして使う</button>${p.owner==ME?`<button class="btn w sm" data-act="unshareP" data-i="${i}">🔒 自分用に戻す</button>`:''}`:`<button class="btn w sm" data-act="shareP" data-i="${i}">👥 みんなに共有する</button>`}${S.confirmP===i?`<span class="hint" style="margin:0">本当に削除しますか?</span><button class="btn w sm red" data-act="delP" data-i="${i}">削除する</button><button class="btn w sm" data-act="noDelP">やめる</button>`:`<button class="btn w sm red" data-act="askDelP" data-i="${i}">削除</button>`}</div>`}</div>`;
+ const mine=list.filter(({p})=>!p.shared),sh=list.filter(({p})=>p.shared);
+ return hdr(true)+`<div class="card warn" style="margin-top:0"><div class="ttl">💡 新しいプロンプトを作るときのポイント</div><div style="font-size:13px;line-height:1.8">プロンプトには、<b>どんなコメントにしたいか</b>(口調・褒め方・視点・文字数など)だけを書いてください。<br>コメントを取り込むための出力の形式(<b>1人1行・タブ区切り・未記入の児童も1行</b>)は、コピーするときに<b>アプリが自動で後ろに足します</b>。</div></div>
+ <div class="card"><div class="ttl">📚 プロンプトライブラリ</div><div class="hint" style="margin:0 0 8px">「自分用」は自分だけに表示されます。「共有」は全員に表示され、誰でも編集・削除できます。</div>
  <div class="two"><input type="text" data-in="pquery" value="${esc(S.pquery)}" placeholder="🔍 名称・目的で検索"><div style="display:flex;gap:8px"><select data-in="fs"><option value="">教科:すべて</option>${Object.keys(SUBJ).map(s=>`<option ${S.fs==s?'selected':''}>${s}</option>`).join('')}</select><select data-in="fg"><option value="">学年:すべて</option>${['1年','2年','3年','4年','5年','6年'].map(s=>`<option ${S.fg==s?'selected':''}>${s}</option>`).join('')}</select></div></div>
- ${list.length?list.map(({p,i})=>`<div class="pr"><div class="prh"><b>${esc(p.name)}</b><span class="mini2">${esc(p.subject||'指定なし')}</span><span class="mini2">${p.grades.length?esc(p.grades.join('・')):'全学年'}</span></div><div class="hint" style="margin:4px 0 8px">${esc(p.purpose)}</div>
- ${S.editP===i?`<textarea rows="5" data-in="editPBody">${esc(S.editPBody)}</textarea><div class="btns" style="margin-top:6px"><button class="btn sm" data-act="saveP" data-i="${i}">保存する</button><button class="btn w sm" data-act="cancelP">キャンセル</button></div>`:`<div class="btns" style="margin:0"><button class="btn w sm" data-act="copyP" data-i="${i}">📋 コピー</button><button class="btn w sm" data-act="editP" data-i="${i}">✏️ 編集</button>${S.confirmP===i?`<span class="hint" style="margin:0">本当に削除しますか?</span><button class="btn w sm red" data-act="delP" data-i="${i}">削除する</button><button class="btn w sm" data-act="noDelP">やめる</button>`:`<button class="btn w sm red" data-act="askDelP" data-i="${i}">削除</button>`}</div>`}</div>`).join(''):'<div class="hint">条件に合うプロンプトがありません。</div>'}</div>
- <div class="card"><div class="ttl">＋ 新しいプロンプトを登録</div><div class="two"><div class="fld"><div class="lbl">名称(自由に決めてください)</div><input type="text" data-in="pf_name" value="${esc(f.name)}" placeholder="例:○○式・家庭科用のコメント"></div><div class="fld"><div class="lbl">教科</div><select data-in="pf_subject"><option value="">(指定なし・汎用)</option>${Object.keys(SUBJ).map(s=>`<option ${f.subject==s?'selected':''}>${s}</option>`).join('')}</select></div></div>
+ <div class="lbl" style="margin-top:12px">🔒 自分用(あなただけに表示)</div>${mine.length?mine.map(item).join(''):'<div class="hint">自分用のプロンプトはありません。</div>'}
+ <div class="lbl" style="margin-top:14px">👥 みんなで共有</div>${sh.length?sh.map(item).join(''):'<div class="hint">共有されているプロンプトはありません。</div>'}</div>
+ <div class="card"><div class="ttl">＋ 新しいプロンプトを登録</div><div class="fld"><div class="lbl">見せる範囲</div><div class="pg"><button data-act="pfs" data-v="0" class="${!f.shared?'on':''}">🔒 自分用(自分だけ)</button><button data-act="pfs" data-v="1" class="${f.shared?'on':''}">👥 みんなに共有</button></div><div class="hint" style="margin:4px 0 0">${f.shared?'全員のライブラリに表示され、作成者としてあなたの名前が出ます。誰でも編集・削除できます。':'他の先生には表示されません。あとで「みんなに共有する」に変えられます。'}</div></div>
+ <div class="two"><div class="fld"><div class="lbl">名称(自由に決めてください)</div><input type="text" data-in="pf_name" value="${esc(f.name)}" placeholder="例:○○式・家庭科用のコメント"></div><div class="fld"><div class="lbl">教科</div><select data-in="pf_subject"><option value="">(指定なし・汎用)</option>${Object.keys(SUBJ).map(s=>`<option ${f.subject==s?'selected':''}>${s}</option>`).join('')}</select></div></div>
  <div class="fld"><div class="lbl">学年(複数選択可・任意)</div><div class="pg">${['1年','2年','3年','4年','5年','6年'].map(g=>`<button data-act="pfg" data-g="${g}" class="${f.grades.includes(g)?'on':''}">${g}</button>`).join('')}</div></div>
  <div class="fld"><div class="lbl">教科・目的(補足)</div><input type="text" data-in="pf_purpose" value="${esc(f.purpose)}" placeholder="例:低学年向け/励ましつき"></div>
- <div class="fld"><div class="lbl">プロンプト本文</div><textarea rows="5" data-in="pf_body" placeholder="Gemに渡すプロンプトの本文をそのまま貼り付けてください">${esc(f.body)}</textarea></div>
+ <div class="fld"><div class="lbl">プロンプト本文(口調・観点・文字数など)</div><textarea rows="5" data-in="pf_body" placeholder="例:あなたは小学校の先生です。励ましを中心に、50〜80文字でコメントを返してください。">${esc(f.body)}</textarea></div>
  <div class="btns"><button class="btn" data-act="regP">登録する</button></div></div>`}
 function vAsk(){return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">❓ 質問する</div><div class="hint" style="margin:0 0 8px">使い方で分からないことを自由に書いてください。アプリの説明といっしょにコピーされるので、いつものようにGeminiに貼り付ければ、答えが返ってきます。</div><div class="lbl">質問</div><textarea rows="4" data-in="ask" placeholder="例:課題リンクにチェックを付けさせたいけど、どこで設定するの?">${esc(S.ask)}</textarea><div class="btns"><button class="btn" data-act="copyAsk">質問をコピーする</button></div>${S.askOut?`<div class="fld"><div class="lbl">コピーされる内容(うまくコピーできないときは、ここから全選択)</div><textarea rows="6" readonly data-sel="1">${esc(S.askOut)}</textarea></div>`:''}</div>`}
 function vGuide(){return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">❓ 使い方ガイド</div><div class="lbl">🎬 3分で分かる操作デモ</div><div class="demo-box">(操作デモの動画がここに入ります)</div><div class="lbl" style="margin-top:14px">🔰 初めての方はここから(4ステップ)</div><div class="gd"><div class="gc"><b>① 授業を追加</b><span>ホームから、自分のクラスと教科を登録</span></div><div class="gc"><b>② 単元を作る</b><span>クラスを開いて、単元名を入力</span></div><div class="gc"><b>③ めあてを設定</b><span>時数ごとに入力して「クラス全員に設定」</span></div><div class="gc"><b>④ 児童にURLを伝える</b><span>児童がログインすれば、自分のクラスが出ます</span></div></div></div>
@@ -262,7 +273,7 @@ const A={
  editC:d=>{const r=recsOf(curUnit(),S.period)[+d.i];S.editC=d.i+'|'+S.period;S.editText=r.comment;render()},
  cancelEdit:()=>{S.editC=null;render()},
  saveEdit:d=>{recsOf(curUnit(),S.period)[+d.i].comment=S.editText.trim();S.editC=null;render();toast('コメントを保存しました')},
- copyGem:()=>{const rec=recsOf(curUnit(),S.period).filter(r=>!r.absent);if(!rec.some(r=>r.reflection)){toast('まだコピーできる内容がありません');return}S.gem=rec.map(r=>r.name+'\t'+(r.reflection||'(未記入)')).join('\n');clip(S.gem);render()},
+ copyGem:()=>{const rec=recsOf(curUnit(),S.period).filter(r=>!r.absent);if(!rec.some(r=>r.reflection)){toast('まだコピーできる内容がありません');return}const c=promptOpts().cur;if(!c){toast('使えるプロンプトがありません');return}S.gem=c.p.body+FMT+'\n\n【児童のふりかえり】\n'+rec.map(r=>r.name+'\t'+(r.reflection||'(未記入)')).join('\n');clip(S.gem);render();toast('プロンプトとふりかえりをコピーしました')},
  sampleReply:()=>{const rec=recsOf(curUnit(),S.period).filter(r=>!r.absent);S.pasted='```text\n'+rec.map((r,i)=>r.name+'\t'+(r.reflection?CM[(i+2)%8]:'')).join('\n')+'\n```';S.warn='';render()},
  parse:()=>{let t=S.pasted.trim();const m=t.match(/```[a-zA-Z]*\n([\s\S]*?)```/);if(m)t=m[1].trim();const target=recsOf(curUnit(),S.period).filter(r=>!r.absent);const lines=t.split('\n').map(l=>l.trim()).filter(l=>l);S.warn='';if(!lines.length){S.warn='回答の行が見つかりませんでした。貼り付けた内容を確認してください。';render();return}if(lines.length!=target.length)S.warn=`件数が一致しません(この時間の対象児童は${target.length}人、Geminiの回答は${lines.length}行)。内容をよく確認してから反映してください。`;S.review=target.map((r,i)=>{const line=lines[i]||'',ti=line.indexOf('\t');let fb;if(ti!=-1)fb=line.slice(ti+1).trim();else{const c=line.replace(/[\s　]/g,'');fb=(c==r.name||c.length<=8)?'':line}return{name:r.name,feedback:fb}});render()},
  cancelReview:()=>{S.review=null;render()},
@@ -274,9 +285,10 @@ const A={
  tgt:d=>{S.tg=S.tg||[...NAMES];const i=S.tg.indexOf(d.n);if(i<0)S.tg.push(d.n);else S.tg.splice(i,1);render()},
  copyP:d=>clip(D.prompts[+d.i].body),
  editP:d=>{S.editP=+d.i;S.editPBody=D.prompts[+d.i].body;render()},cancelP:()=>{S.editP=null;render()},saveP:d=>{D.prompts[+d.i].body=S.editPBody;S.editP=null;render();toast('保存しました')},
+ shareP:d=>{D.prompts[+d.i].shared=true;render();toast('みんなに共有しました(作成者:あなた)')},unshareP:d=>{D.prompts[+d.i].shared=false;render();toast('自分用に戻しました')},dupP:d=>{const p=D.prompts[+d.i];D.prompts.push({...p,grades:[...p.grades],name:p.name+'(自分用)',owner:ME,shared:false});render();toast('自分用にコピーしました。自由に直せます')},pfs:d=>{S.pform.shared=d.v=='1';render()},
  askDelP:d=>{S.confirmP=+d.i;render()},noDelP:()=>{S.confirmP=null;render()},delP:d=>{D.prompts.splice(+d.i,1);S.confirmP=null;render();toast('削除しました')},
  pfg:d=>{const g=S.pform.grades,i=g.indexOf(d.g);if(i<0)g.push(d.g);else g.splice(i,1);render()},
- regP:()=>{const f=S.pform;if(!f.name.trim()||!f.body.trim()){toast('名称とプロンプト本文を入力してください');return}D.prompts.push({...f,grades:[...f.grades]});S.pform={name:'',subject:'',grades:[],purpose:'',body:''};render();toast('登録しました')},
+ regP:()=>{const f=S.pform;if(!f.name.trim()||!f.body.trim()){toast('名称とプロンプト本文を入力してください');return}D.prompts.push({...f,grades:[...f.grades],owner:ME});S.pform={name:'',subject:'',grades:[],purpose:'',body:'',shared:false};render();toast(f.shared?'みんなに共有して登録しました':'自分用に登録しました')},
  copyAsk:()=>{if(!S.ask.trim()){toast('質問を入力してください');return}S.askOut='あなたは「ふりかえりシート」というアプリの使い方に詳しいサポート担当です。\n以下のアプリの説明を参考に、先生からの質問に、分かりやすく丁寧に答えてください。\n説明から分からないことは、想像で答えず「この資料からは分かりません」と答えてください。\n\n【アプリの説明】(ここにアプリの説明が入ります)\n\n【先生からの質問】\n'+S.ask;clip(S.askOut);render()}
 };
 document.getElementById('app').addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(a&&A[a.dataset.act]){A[a.dataset.act](a.dataset);return}const s=e.target.closest('[data-sel]');if(s)s.select()});
@@ -291,14 +303,15 @@ const IN={
  rev:(v,el)=>S.review[+el.dataset.i].feedback=v,
  newUnit:v=>S.newUnit=v,copySrc:v=>{S.copySrc=v;render()},goals:v=>curUnit().goals=v,
  pquery:v=>{S.pquery=v;render();const i=document.querySelector('[data-in=pquery]');if(i){i.focus();i.setSelectionRange(v.length,v.length)}},fs:v=>{S.fs=v;render()},fg:v=>{S.fg=v;render()},
- editPBody:v=>S.editPBody=v,pf_name:v=>S.pform.name=v,pf_subject:v=>S.pform.subject=v,pf_purpose:v=>S.pform.purpose=v,pf_body:v=>S.pform.body=v,ask:v=>S.ask=v
+ editPBody:v=>S.editPBody=v,pickp:v=>{S.lastP[S.key]=v;S.gem='';render()},pf_name:v=>S.pform.name=v,pf_subject:v=>S.pform.subject=v,pf_purpose:v=>S.pform.purpose=v,pf_body:v=>S.pform.body=v,ask:v=>S.ask=v
 };
-const SELECTS=['addRole','addClass','addSubject','unit','copySrc','fs','fg','pformat','ppeermode','pf_subject'];
+const SELECTS=['addRole','addClass','addSubject','unit','copySrc','fs','fg','pformat','ppeermode','pf_subject','pickp'];
 const CHECKS=['peval','pcheck','ppeer','pprog','absent'];
 document.getElementById('app').addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.in;if(!k||!IN[k])return;if(SELECTS.includes(k)||CHECKS.includes(k))return;IN[k](e.target.value,e.target)});
 document.getElementById('app').addEventListener('change',e=>{const k=e.target.dataset&&e.target.dataset.in;if(!k||!IN[k])return;if(SELECTS.includes(k)||CHECKS.includes(k))IN[k](e.target.value,e.target)});
 document.getElementById('app').addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.det)S.detail=e.target.open},true);
 render();
 </script>
+
 
 </html>
