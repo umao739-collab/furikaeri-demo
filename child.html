@@ -104,6 +104,7 @@ textarea{width:100%;min-height:96px;border:2px solid #F3E2BC;background:#FFFBF0;
 <div class="side"><h3>見本の操作(本番にはありません)</h3>
 <button data-d="reset">↺ はじめから</button>
 <button data-d="deco">🎁 あと1回保存すると飾りが届く状態にする</button>
+<button data-d="mate">👥 あと1回保存するとなかまが増える状態にする</button>
 <button data-d="done">🎉 あと1回保存するとお部屋かんせいの状態にする</button>
 <div>流れ:ホーム → 国語 → 3時間め or 4時間め → 保存 → ホーム。<br>ふりかえり欄を空にして保存すると、星は増えません。<br>お部屋の飾りも、なかまも、ホームでそのままドラッグできます。</div></div>
 </div>
@@ -184,8 +185,10 @@ const POS={rug:[50,88],picture:[50,20],sofa:[34,80],window:[84,32],plant:[72,76]
 const THEMES={house:'linear-gradient(180deg,#FFEFC9 0 56%,#E0B27A 56% 100%)',forest:'linear-gradient(180deg,#CFEFD2 0 56%,#8FC37A 56% 100%)',sea:'linear-gradient(180deg,#BFE6F7 0 56%,#F4E2AE 56% 100%)',space:'linear-gradient(180deg,#2B2F6B,#5B4A9C)',sweets:'linear-gradient(180deg,#FFE0EE 0 56%,#F5C6A5 56% 100%)'};
 const PER=[{n:1,d:'10/21',g:'ものがたりの じょうけいを つかもう'},{n:2,d:'10/23',g:'ごんの ぎもんを みつけよう'},{n:3,d:'10/28',g:'ごんの きもちを かんがえよう'},{n:4,d:'10/30',g:'ごんと ひょうじゅうの かんけいを まとめよう'}];
 const SAMPLE='ごんが ひょうじゅうに つぐないを するところで、ごんの さみしさが わかった。';
+const MATES=[['bear',0],['cat',0],['rabbit',0],['dog',10],['chick',25],['hamster',40],['lion',60],['koala',85],['elephant',110]];
+const unlocked=()=>MATES.filter(([k,n])=>ST.stars>=n).map(a=>a[0]);
 let ST,LAY;
-function init(){ST={type:'bear',stars:38,roomStart:0,theme:'house',written:{1:1,2:1},screen:'picker',first:true,newIdx:-1,eval:'◎',n:3};LAY=JSON.parse(JSON.stringify(POS))}
+function init(){ST={type:'bear',stars:38,roomStart:0,theme:'house',written:{1:1,2:1},screen:'picker',first:true,newIdx:-1,eval:'◎',n:3,seen:[],newMate:null};ST.seen=unlocked();LAY=JSON.parse(JSON.stringify(POS))}
 init();
 const PH=document.getElementById('ph');
 const $=s=>PH.querySelector(s);
@@ -194,7 +197,7 @@ const unwritten=()=>PER.filter(p=>!ST.written[p.n]).length;
 function head(back){return `<div class="top">${back?'<button class="btn sm" data-act="back">← もどる</button>':'<div><div class="hello">たろうさん、こんにちは!</div><div class="ttl">🏠 なかまの おへや</div></div>'}<div class="stars">⭐ ${ST.stars}</div></div>`}
 const SCR={
  picker:()=>`<div class="center" style="padding-top:8px"><div class="big" style="font-size:20px">いっしょに すごす なかまを えらぼう!</div><div style="font-size:12px;font-weight:700">あとから かえられるよ</div></div>
-  <div class="cg">${Object.keys(COL).map(k=>`<div data-act="pick" data-t="${k}" class="${k==ST.type?'on':''}">${charSVG(k)}${COL[k][2]}</div>`).join('')}</div>
+  <div class="cg">${unlocked().map(k=>`<div data-act="pick" data-t="${k}" class="${k==ST.type?'on':''}" style="position:relative">${ST.seen.includes(k)?'':'<span style="position:absolute;top:-6px;right:-4px;background:#E8483A;color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;z-index:2">NEW</span>'}${charSVG(k)}${COL[k][2]}</div>`).join('')}</div>
   <button class="btn b2 full" data-act="startOK">この子にする!</button>`,
  home:()=>`${head(false)}<div id="room" style="height:250px"></div>
   <div class="hint" style="margin:6px 0 0">👆 かざりも なかまも ドラッグして うごかせるよ</div><div class="btns"><button class="btn" data-act="companion">🐾 なかま</button></div>
@@ -217,11 +220,12 @@ const SCR={
  complete:()=>`<div class="center" style="padding-top:16px"><div class="pop" style="font-size:54px">🎉🏠🎉</div><div class="big">お部屋が かんせい!</div><div style="font-size:13px;font-weight:700">つぎは どんな お部屋にする?</div></div>
   <div class="pick">${[['forest','🌲','もり','#CFEFD2'],['sea','🌊','うみ','#BFE6F7'],['space','🚀','うちゅう','#C9C6F5'],['sweets','🍰','おかし','#FFD6E8']].map(a=>`<div class="theme" data-act="theme" data-t="${a[0]}" style="background:${a[3]}"><span class="e">${a[1]}</span>${a[2]}</div>`).join('')}</div>
   <div class="center" style="font-size:11px;color:#7a7a72;margin-top:12px;font-weight:700">かんせいした お部屋は「アルバム」で いつでも見られるよ</div>`,
+ mate:()=>`<div class="center" style="padding-top:20px"><div class="pop" style="font-size:54px">🎁</div><div class="big" style="font-size:20px">あたらしい なかまが きたよ!</div></div><div class="center" style="width:150px;margin:6px auto 0">${charSVG(ST.newMate)}</div><div class="center big" style="font-size:20px;margin-top:6px">${COL[ST.newMate][2]}</div><button class="btn b2 full" style="margin-top:14px" data-act="mateNow">いっしょに すごす</button><button class="btn full" style="margin-top:8px" data-act="mateLater">あとで(「🐾 なかま」で あえるよ)</button>`,
  edit:()=>`<div class="top"><div class="ttl">🎨 もようがえ</div><div class="stars">⭐ ${ST.stars}</div></div><div id="room" class="edit" style="height:300px"></div><div class="card" style="font-size:12px;font-weight:700">👆 ドラッグして すきなところへ</div><div class="btns"><button class="btn" data-act="editReset">↩ もとにもどす</button><button class="btn b2" data-act="editDone" style="background:#E8734A;color:#fff">✅ かんりょう</button></div>`
 };
 let CUR=null,S={x:0,y:0,tx:0,ty:0,mode:'idle',t:1,dir:1};
 function render(){
- CUR=null;PH.innerHTML=SCR[ST.screen]();
+ CUR=null;PH.innerHTML=SCR[ST.screen]();if(ST.screen=='picker')ST.seen=unlocked();
  const r=$('#room');if(r)mount(r,ST.screen=='home',ST.screen=='deco'?ST.newIdx:-1);
  if(ST.screen=='home'&&ST.first){ST.first=false}
 }
@@ -276,10 +280,12 @@ const ACT={
  eval:a=>{ST.draft=$('#ta').value;ST.eval=a.dataset.v;render()},
  back:()=>{ST.screen=ST.screen=='write'?'subject':'home';render()},
  save:()=>{const v=$('#ta').value.trim();if(!v){toast('なにか かいてから ほぞんしてね');return}
-  const before=nItems();ST.written[ST.n]=1;ST.stars++;ST.draft=undefined;ST.newIdx=nItems()>before?nItems()-1:-1;ST.screen='saved';render()},
- afterSaved:()=>{ST.screen=ST.newIdx>=0?'deco':'home';render()},
- afterDeco:()=>{ST.screen=nItems()>=12?'complete':'home';render()},
- theme:a=>{ST.theme=a.dataset.t;ST.roomStart=ST.stars;ST.screen='home';render()},
+  const before=nItems();ST.written[ST.n]=1;ST.stars++;ST.draft=undefined;ST.newIdx=nItems()>before?nItems()-1:-1;const nm=MATES.find(([k,n])=>n>0&&n<=ST.stars&&!ST.seen.includes(k));ST.newMate=nm?nm[0]:null;ST.screen='saved';render()},
+ afterSaved:()=>{ST.screen=ST.newIdx>=0?'deco':(ST.newMate?'mate':'home');render()},
+ afterDeco:()=>{ST.screen=nItems()>=12?'complete':(ST.newMate?'mate':'home');render()},
+ mateNow:()=>{ST.type=ST.newMate;ST.seen=unlocked();ST.newMate=null;ST.screen='home';render()},
+ mateLater:()=>{ST.newMate=null;ST.screen='home';render()},
+ theme:a=>{ST.theme=a.dataset.t;ST.roomStart=ST.stars;ST.screen=ST.newMate?'mate':'home';render()},
  edit:()=>{ST.screen='edit';render()},
  editDone:()=>{ST.screen='home';render()},
  editReset:()=>{LAY=JSON.parse(JSON.stringify(POS));render()}
@@ -288,6 +294,7 @@ PH.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(a&&ACT
 document.querySelectorAll('.side [data-d]').forEach(b=>b.onclick=()=>{const d=b.dataset.d;
  if(d=='reset'){init();ST.screen='picker'}
  if(d=='deco'){init();ST.screen='home';ST.first=false;ST.stars=39}
+ if(d=='mate'){init();ST.screen='home';ST.first=false;ST.stars=24;ST.seen=unlocked()}
  if(d=='done'){init();ST.screen='home';ST.first=false;ST.stars=59;ST.written={1:1,2:1,3:1}}
  render()});
 render();
