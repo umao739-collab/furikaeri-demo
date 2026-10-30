@@ -108,7 +108,7 @@ textarea{width:100%;min-height:96px;border:2px solid #F3E2BC;background:#FFFBF0;
 <button data-d="deco">🎁 あと1回保存すると飾りが届く状態にする</button>
 <button data-d="mate">👥 あと1回保存すると新しいなかまが来る状態にする(2ひき→入れかえ)</button>
 <button data-d="done">🎉 あと1回保存するとお部屋かんせいの状態にする</button>
-<div>流れ:ホーム → 国語 → 3時間め or 4時間め → 保存 → ホーム。<br>ふりかえり欄を空にして保存すると、星は増えません。<br>お部屋の飾りも、なかまも、ホームでそのままドラッグできます。</div></div>
+<div>流れ:ホーム → 国語 → 3時間め or 4時間め → 保存 → ホーム。<br>ふりかえり欄を空にして保存すると、星は増えません。<br>お部屋の飾りも、なかまも、ホームでそのままドラッグできます。<br>2ひきいるときは、ときどき2ひきで会話します(しばらく待つか、なかまをタップしてみてください)。</div></div>
 </div>
 <script>
 const OL='#6b5646';
@@ -263,9 +263,14 @@ function mount(room,edit,newIdx){
 function draw(){if(!CUR)return;const{RH}=CUR;CUR.chs.forEach(({ch,s})=>{const k=.78+.4*Math.max(0,Math.min(1,(s.y/RH-.6)/.34));ch.style.left=s.x+'px';ch.style.top=s.y+'px';ch.style.zIndex=Math.round(s.y*3);ch.style.scale=k;const i=ch.querySelector('.in');if(i&&!ch.classList.contains('jump'))i.style.transform='scaleX('+s.dir+')'})}
 function setMode(c,m){c.s.mode=m;const ch=c.ch;ch.classList.remove('idle','walk','sleep');ch.classList.add(m);const z=ch.querySelector('.z');if(z)z.remove();if(m=='sleep'){const e=document.createElement('div');e.className='z';e.textContent='z z';ch.appendChild(e)}}
 const SAY=['きょうも がんばろう!','いっしょに いるよ','おはなし きかせてね','ゆっくりで だいじょうぶ','きょうは どんな ことが あったかな?','かんがえるって たのしいね','おへや いい かんじだね','ふぅ… ちょっと ひとやすみ','ふりかえり かけたら おしえてね','ありがとう!'];
-let lastSay=-1;
-function say(c){if(!c)return;const ch=c.ch;const old=ch.querySelector('.say-b');if(old)old.remove();let i;do{i=Math.floor(Math.random()*SAY.length)}while(i===lastSay);lastSay=i;const s=document.createElement('div');s.className='say-b';s.textContent=SAY[i];ch.appendChild(s);setTimeout(()=>s.remove(),2600)}
-(function later(){setTimeout(()=>{if(CUR&&ST.screen=='home'){const a=CUR.chs.filter(c=>!c.busy&&c.s.mode!=='sleep'&&!CUR.chs.some(o=>o.ch.querySelector('.say-b')));if(a.length)say(a[Math.floor(Math.random()*a.length)])}later()},9000+Math.random()*8000)})();
+let lastSay=-1,lastTalk=-1;
+const TALK=[['なんだか ほっと するね','うん、ここ すきだな'],['きょうは なにを かこうかな?','ゆっくり かんがえて いいよ'],['おへや あたたかい ね','うん、いい かんじ'],['ねむく なってきた…','すこし やすもうか'],['いっしょに いると たのしいね','うん! いっしょ だね'],['ふりかえり できたら おしえてね','たのしみに してるよ'],['おなか すいた ね','おやつの じかん かな?'],['ねえ ねえ ききたい ことが あるの','なあに? きかせて']];
+function chat(){if(!CUR||CUR.chs.length<2)return;const [p,q]=CUR.chs.slice().sort((a,b)=>a.s.x-b.s.x);if(CUR.chs.some(c=>c.busy||c.s.mode=='sleep'||c.ch.querySelector('.say-b')))return;
+ let i;do{i=Math.floor(Math.random()*TALK.length)}while(i===lastTalk);lastTalk=i;
+ [p,q].forEach(c=>{setMode(c,'idle');c.s.t=7});p.s.dir=1;q.s.dir=-1;
+ say(p,TALK[i][0]);setTimeout(()=>{if(CUR&&CUR.chs.includes(q)&&q.ch.isConnected)say(q,TALK[i][1])},2300)}
+function say(c,txt){if(!c)return;const ch=c.ch;const old=ch.querySelector('.say-b');if(old)old.remove();let i;do{i=Math.floor(Math.random()*SAY.length)}while(i===lastSay);lastSay=i;const s=document.createElement('div');s.className='say-b';s.textContent=txt||SAY[i];ch.appendChild(s);setTimeout(()=>s.remove(),2600)}
+(function later(){setTimeout(()=>{if(CUR&&ST.screen=='home'){const a=CUR.chs.filter(c=>!c.busy&&c.s.mode!=='sleep'&&!CUR.chs.some(o=>o.ch.querySelector('.say-b')));if(CUR.chs.length>1&&Math.random()<.6)chat();else if(a.length)say(a[Math.floor(Math.random()*a.length)])}later()},9000+Math.random()*8000)})();
 let last=performance.now();
 function loop(now){const dt=Math.min(.05,(now-last)/1000);last=now;
  if(CUR)CUR.chs.forEach(c=>{const S=c.s;if(c.busy)return;S.t-=dt;
