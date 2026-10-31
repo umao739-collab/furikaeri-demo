@@ -129,8 +129,7 @@ textarea{min-height:140px;font-size:16px}
 .lch svg{display:block;width:100%;height:auto;overflow:visible}
 .lch .seed{display:none}
 .lenv{position:absolute;left:50%;top:56%;margin-left:-20px;font-size:38px;line-height:1;animation:lpop .5s both;z-index:2}
-.lenv::before,.lenv::after{content:'';position:absolute;top:58%;width:13px;height:11px;border-radius:50%;background:#F6C9B4;border:1.6px solid #6b4a3a}
-.lenv::before{left:-6px}.lenv::after{right:-6px}
+.lenv{filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));rotate:-6deg;top:60%}
 @keyframes lpop{from{scale:0;opacity:0}to{scale:1;opacity:1}}
 .lenv.drop{animation:ldrop .7s forwards}
 @keyframes ldrop{to{translate:var(--dx,80px) var(--dy,-10px);scale:.3;opacity:0}}
