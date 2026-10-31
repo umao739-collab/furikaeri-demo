@@ -127,6 +127,7 @@ textarea{min-height:140px;font-size:16px}
 <button data-d="three">🐾 あと1回保存すると3びきめが選べる状態にする</button>
 <button data-d="mate">👥 あと1回保存するとコアラが来る状態にする</button>
 <button data-d="deco">🎁 あと1回保存すると飾りが届く状態にする</button>
+<button data-d="reply">💌 先生から返事が来た状態にする</button>
 <button data-d="done">🎉 あと1回保存するとお部屋かんせい(→2ひきめも)の状態にする</button>
 <div>流れ:ホーム → 国語 → 3時間め or 4時間め → 保存 → ホーム。<br>ふりかえり欄を空にして保存すると、星は増えません。<br>お部屋の飾りも、なかまも、ホームでそのままドラッグできます。<br>2ひきいるときは、ときどき2ひきで会話します(しばらく待つか、なかまをタップしてみてください)。</div>
 </div></details></div>
@@ -214,8 +215,9 @@ const SLOTS=()=>ST.stars>=130?3:ST.stars>=60?2:1;
 const cnt=n=>n==3?'3びき':n+'ひき';
 const nextEvent=()=>ST.newMate?'mate':(ST.newSlot?'slot':'home');
 const unlocked=()=>MATES.filter(([k,n])=>ST.stars>=n).map(a=>a[0]);
+const TEACHERS=[{n:'田中先生',r:'担任'},{n:'山本先生',r:'音楽'},{n:'佐藤先生',r:'外国語'}];
 let ST,LAY;
-function init(){ST={types:['bear'],stars:0,roomStart:0,theme:'house',written:{},screen:'picker',first:true,newIdx:-1,eval:'◎',n:3,seen:[],newMate:null,newSlot:false};ST.seen=unlocked();LAY=JSON.parse(JSON.stringify(POS))}
+function init(){ST={types:['bear'],stars:0,roomStart:0,theme:'house',written:{},screen:'picker',first:true,newIdx:-1,eval:'◎',n:3,seen:[],newMate:null,newSlot:false,letters:[],replyArrived:false,to:null,kind:'reply',ldraft:''};ST.seen=unlocked();LAY=JSON.parse(JSON.stringify(POS))}
 init();
 const PH=document.getElementById('ph');
 const $=s=>PH.querySelector(s);
@@ -228,7 +230,7 @@ const SCR={
   <div class="center" style="font-size:13px;font-weight:900;margin-top:10px">${ST.types.length} / ${SLOTS()} えらんだよ</div>
   <button class="btn b2 full" style="margin-top:6px;${ST.types.length>=1?'':'opacity:.5'}" data-act="startOK">${ST.types.length>=2?'この '+cnt(ST.types.length)+'と すごす!':'この子と すごす!'}</button>`,
  home:()=>`${head(false)}<div class="homeg"><div><div id="room"></div>
-  <div class="hint" style="margin:6px 0 0">👆 かざりも なかまも ドラッグして うごかせるよ</div><div class="btns"><button class="btn" data-act="companion">🐾 なかま</button></div></div>
+  <div class="hint" style="margin:6px 0 0">👆 かざりも なかまも ドラッグして うごかせるよ</div><div class="btns"><button class="btn" data-act="companion">🐾 なかま</button><button class="btn" data-act="letter" style="position:relative">💌 せんせいに おてがみ${ST.replyArrived?'<span class="badge" style="top:-10px">おへんじ!</span>':''}</button></div></div>
   <div class="grid">
    <div class="tile" data-act="subject" style="background:#FFD9D9">${unwritten()?`<div class="badge">あと${unwritten()}</div>`:''}<div class="ic">📕</div><div class="nm">国語</div><div class="st">${unwritten()?'かける時間 '+unwritten():'ぜんぶ かいたよ'}</div></div>
    <div class="tile" data-act="other" style="background:#D9ECFF"><div class="ic">🔢</div><div class="nm">算数</div><div class="st">ぜんぶ かいたよ</div></div>
@@ -250,6 +252,17 @@ const SCR={
   <div class="center" style="font-size:11px;color:#7a7a72;margin-top:12px;font-weight:700">かんせいした お部屋は「アルバム」で いつでも見られるよ</div>`,
  mate:()=>`<div class="center" style="padding-top:20px"><div class="pop" style="font-size:54px">🎁</div><div class="big" style="font-size:20px">あたらしい なかまが きたよ!</div></div><div class="center" style="width:150px;margin:6px auto 0">${charSVG(ST.newMate)}</div><div class="center big" style="font-size:20px;margin-top:6px">${COL[ST.newMate][2]}</div><button class="btn b2 full" style="margin-top:14px" data-act="mateNow">${ST.types.length<SLOTS()?'いっしょに すごす':'いっしょに すごす なかまを えらぶ'}</button><button class="btn full" style="margin-top:8px" data-act="mateLater">あとで(「🐾 なかま」で あえるよ)</button>`,
  slot:()=>`<div class="center" style="padding-top:20px"><div class="pop" style="font-size:54px">🎉</div><div class="big" style="font-size:20px">${cnt(SLOTS())}めの なかまを むかえられるよ!</div><div style="font-size:13px;font-weight:700;margin-top:8px">いま えらべる なかまから、すきな子を えらんでね</div></div><div class="cg" style="margin-top:12px">${unlocked().filter(k=>!ST.types.includes(k)).slice(0,3).map(k=>`<div style="cursor:default">${charSVG(k)}${COL[k][2]}</div>`).join('')}</div><button class="btn b2 full" style="margin-top:14px" data-act="slotGo">なかまを えらぶ</button>`,
+ letterHome:()=>`${head(true)}<div class="center big" style="font-size:20px">💌 せんせいへの おてがみ</div><div class="center" style="font-size:12px;font-weight:700;color:#8a6a2b">はなしたいこと、きいてほしいことを、せんせいに おくれるよ</div>
+  <button class="btn b2 full" data-act="letterNew">✏️ あたらしく かく</button>
+  ${ST.letters.length?`<div class="lbl" style="margin-top:16px">これまでの おてがみ</div>`+ST.letters.map(l=>`<div class="card" style="margin-top:6px"><div style="font-size:12px;font-weight:900;color:#C24F28">${l.to}に おくったよ</div><div style="font-size:14px;font-weight:700;margin-top:4px">${l.text.slice(0,60)}${l.text.length>60?'…':''}</div>${l.reply?`<div style="margin-top:8px;background:#F1F8EC;border-radius:12px;padding:8px 10px;font-size:14px;font-weight:700"><span style="font-size:11px;color:#3d7a35;font-weight:900">💬 ${l.to}から おへんじ</span><br>${l.reply}</div>`:''}</div>`).join(''):'<div class="center hint" style="margin-top:14px">まだ おてがみは ないよ</div>'}`,
+ letterTo:()=>`${head(true)}<div class="center big" style="font-size:20px">だれに おてがみを かく?</div><div class="center" style="font-size:12px;font-weight:700;color:#8a6a2b">えらんだ せんせいだけに とどくよ</div>
+  <div style="display:grid;gap:10px;margin-top:14px">${TEACHERS.map((t,i)=>`<div class="tile" data-act="letterPick" data-i="${i}" style="background:${['#FFD9D9','#D9ECFF','#DFF3DC'][i]};display:flex;align-items:center;gap:14px;padding:16px 20px;text-align:left"><div style="font-size:30px">${['🍎','🎵','🔤'][i]}</div><div><div style="font-size:20px;font-weight:900">${t.n}</div><div style="font-size:12px;font-weight:700;opacity:.8">${t.r==='担任'?'クラスの たんにんの せんせい':t.r+'の せんせい'}</div></div></div>`).join('')}</div>`,
+ letterWrite:()=>`${head(true)}<div class="card" style="margin-top:4px;background:#FFF6EE"><div style="font-size:16px;font-weight:900;color:#C24F28">💌 ${ST.to.n}に とどくよ</div><div style="font-size:12px;font-weight:700;margin-top:2px">${ST.to.n}だけが よむよ。ほかの せんせいには みえないよ。</div></div>
+  <div class="card"><textarea id="lta" placeholder="はなしたいこと、きいてほしいこと、なんでも かいてね">${ST.ldraft}</textarea>
+  <div class="lbl" style="margin-top:10px">どうしてほしい?</div><div class="sel" style="gap:8px"><span data-act="lkind" data-v="reply" class="${ST.kind=='reply'?'on':''}" style="font-size:14px;padding:12px 4px">💬 おへんじが ほしい</span><span data-act="lkind" data-v="listen" class="${ST.kind=='listen'?'on':''}" style="font-size:14px;padding:12px 4px">🤍 きいてくれるだけで いい</span></div></div>
+  <div class="center" style="font-size:12px;font-weight:700;color:#8a6a2b;margin-top:8px">せんせいは、すぐには よめない ときも あるよ</div>
+  <button class="btn b2 full" data-act="letterSend">📮 おくる</button>`,
+ letterSent:()=>`<div class="center" style="padding-top:40px"><div class="pop" style="width:130px;margin:auto">${charSVG(ST.types[0])}</div><div class="big">おしえてくれて ありがとう</div><div style="font-size:14px;font-weight:700">${ST.to.n}に とどけたよ</div></div><button class="btn b2 full" style="margin-top:60px" data-act="letterHomeGo">おてがみの ページへ</button><button class="btn full" data-act="back">ホームにもどる</button>`,
  edit:()=>`<div class="top"><div class="ttl">🎨 もようがえ</div><div class="stars">⭐ ${ST.stars}</div></div><div id="room" class="edit" style="height:300px"></div><div class="card" style="font-size:12px;font-weight:700">👆 ドラッグして すきなところへ</div><div class="btns"><button class="btn" data-act="editReset">↩ もとにもどす</button><button class="btn b2" data-act="editDone" style="background:#E8734A;color:#fff">✅ かんりょう</button></div>`
 };
 let CUR=null;const SS=[0,1,2].map(()=>({x:0,y:0,tx:0,ty:0,mode:'idle',t:1,dir:1}));
@@ -257,6 +270,7 @@ function render(){
  CUR=null;PH.innerHTML=ST.screen=='home'?SCR.home():'<div class="narrow">'+SCR[ST.screen]()+'</div>';if(ST.screen=='picker')ST.seen=unlocked();
  const r=$('#room');if(r)mount(r,ST.screen=='home',ST.screen=='deco'?ST.newIdx:-1);
  if(ST.screen=='home'&&ST.first){ST.first=false}
+ if(ST.screen=='home'&&ST.replyArrived&&CUR)setTimeout(()=>{if(CUR&&ST.screen=='home'&&ST.replyArrived)say(CUR.chs[0],'せんせいから おてがみ きてるよ')},900);
 }
 function wallOf(k){return !!ITEMS[k].wall}
 function placeIt(d,x,y,k){d.style.left=x+'%';d.style.top=y+'%';if(wallOf(k)){d.style.translate='-50% -50%';d.style.zIndex=1}else{d.style.translate='-50% -100%';d.style.zIndex=ITEMS[k].flat?2:Math.round(y*3)}}
@@ -314,7 +328,13 @@ const ACT={
  other:()=>toast('見本では 国語だけ ひらけます'),
  write:a=>{ST.n=+a.dataset.n;ST.draft=undefined;ST.screen='write';render()},
  eval:a=>{ST.draft=$('#ta').value;ST.eval=a.dataset.v;render()},
- back:()=>{ST.screen=ST.screen=='write'?'subject':'home';render()},
+ back:()=>{const m={write:'subject',letterHome:'home',letterTo:'letterHome',letterWrite:'letterTo'};ST.screen=m[ST.screen]||'home';render()},
+ letter:()=>{ST.replyArrived=false;ST.screen='letterHome';render()},
+ letterNew:()=>{ST.ldraft='';ST.screen='letterTo';render()},
+ letterPick:a=>{ST.to=TEACHERS[+a.dataset.i];ST.ldraft='';ST.screen='letterWrite';render()},
+ lkind:a=>{ST.ldraft=$('#lta').value;ST.kind=a.dataset.v;render()},
+ letterSend:()=>{const v=$('#lta').value.trim();if(!v){toast('なにか かいてから おくってね');return}ST.letters.unshift({to:ST.to.n,text:v,kind:ST.kind,reply:''});ST.ldraft='';ST.screen='letterSent';render()},
+ letterHomeGo:()=>{ST.screen='letterHome';render()},
  save:()=>{const v=$('#ta').value.trim();if(!v){toast('なにか かいてから ほぞんしてね');return}
   const before=nItems(),sb=SLOTS();ST.written[ST.n]=1;ST.stars++;ST.newSlot=SLOTS()>sb;ST.draft=undefined;ST.newIdx=nItems()>before?nItems()-1:-1;const nm=MATES.find(([k,n])=>n>0&&n<=ST.stars&&!ST.seen.includes(k));ST.newMate=nm?nm[0]:null;ST.screen='saved';render()},
  afterSaved:()=>{ST.screen=ST.newIdx>=0?'deco':nextEvent();render()},
@@ -335,6 +355,7 @@ document.querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const d=b.datase
  if(d=='three'){init();ST.screen='home';ST.first=false;ST.stars=129;ST.roomStart=126;ST.types=['bear','cat'];ST.seen=unlocked()}
  if(d=='deco'){init();ST.screen='home';ST.first=false;ST.stars=39;ST.written={1:1,2:1};ST.seen=unlocked()}
  if(d=='mate'){init();ST.screen='home';ST.first=false;ST.stars=84;ST.roomStart=81;ST.types=['bear','cat'];ST.seen=unlocked()}
+ if(d=='reply'){init();ST.screen='home';ST.first=false;ST.stars=38;ST.types=['bear'];ST.seen=unlocked();ST.letters=[{to:'田中先生',text:'さいきん、ともだちと うまく はなせなくて、すこし さみしい です。',kind:'reply',reply:'おしえてくれて ありがとう。いつでも はなしに きてね。いっしょに かんがえよう。'}];ST.replyArrived=true}
  if(d=='done'){init();ST.screen='home';ST.first=false;ST.stars=59;ST.written={1:1,2:1,3:1};ST.seen=unlocked()}
  render()});
 render();

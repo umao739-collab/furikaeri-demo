@@ -126,7 +126,12 @@ function initData(){
  D.units['4年2組|外国語']=[{name:'Unit 4',goals:'',periods:[mkPeriod('2026-10-14','数をたずねよう'),mkPeriod('2026-10-28','ものの数を答えよう')],recs:{1:genRecs([],2),2:genRecs([0,1],3)}}];
  [['4年1組|算数','わり算'],['4年1組|理科','ものの温度'],['4年2組|音楽','合奏'],['5年1組|家庭科','ミシン']].forEach(([k,u],j)=>{D.units[k]=[{name:u,goals:'',periods:[mkPeriod('2026-10-16','学習のめあて1'),mkPeriod('2026-10-23','学習のめあて2')],recs:{1:genRecs([],j),2:genRecs([],j+1)}}]});
 }
-function reset(){initData();S={view:'home',key:null,tab:'goal',ui:0,period:1,manual:false,drafts:{},gem:'',pasted:'',review:null,detail:false,addRole:'担任',addClasses:['4年2組'],addClass:'4年2組',addSubject:'算数',confirm:null,q:'',fs:'',fg:'',pquery:'',pform:{name:'',subject:'',grades:[],purpose:'',body:'',shared:false},editP:null,stu:0,newUnit:'',copySrc:'',ask:'',askOut:'',confirmP:null,help:null,lastP:{},std:{}}}
+function initLetters(){D.letters=[
+ {id:1,from:'さくら',cls:'4年1組',date:'10/30',daysAgo:1,kind:'reply',read:false,reply:'',text:'さいきん、ともだちと うまく はなせなくて、すこし さみしい です。'},
+ {id:2,from:'みお',cls:'4年1組',date:'10/28',daysAgo:3,kind:'listen',read:false,reply:'',text:'きょう、おなかが いたく なって、きゅうしょくが たべられませんでした。ちょっと しんぱい です。'},
+ {id:3,from:'そうた',cls:'4年1組',date:'10/25',daysAgo:6,kind:'reply',read:false,reply:'',text:'ひるやすみに ドッジボールに いれて もらえなくて かなしかった。'},
+ {id:4,from:'ゆい',cls:'4年1組',date:'10/20',daysAgo:11,kind:'reply',read:true,reply:'おしえてくれて ありがとう。また いつでも かいてね。',text:'ピアノの はっぴょうかいが きんちょうする。'}]}
+function reset(){initData();initLetters();S={view:'home',key:null,tab:'goal',ui:0,period:1,manual:false,drafts:{},gem:'',pasted:'',review:null,detail:false,addRole:'担任',addClasses:['4年2組'],addClass:'4年2組',addSubject:'算数',confirm:null,q:'',fs:'',fg:'',pquery:'',pform:{name:'',subject:'',grades:[],purpose:'',body:'',shared:false},editP:null,stu:0,newUnit:'',copySrc:'',ask:'',askOut:'',confirmP:null,help:null,lastP:{},std:{},openL:null,replyText:''}}
 reset();
 const keyOf=c=>c.cls+'|'+c.subject;
 const unitsOf=k=>D.units[k]||(D.units[k]=[{name:'（単元を作成してください）',goals:'',periods:[mkPeriod('','')],recs:{}}]);
@@ -135,6 +140,7 @@ const recsOf=(u,p)=>{if(!u.recs[p])u.recs[p]=NAMES.map(n=>({name:n,reflection:''
 const isPend=r=>!r.absent&&r.reflection&&!r.comment;
 const pendOfUnit=u=>Object.keys(u.recs).reduce((a,p)=>a+u.recs[p].filter(isPend).length,0);
 const pendOfKey=k=>(D.units[k]||[]).reduce((a,u)=>a+pendOfUnit(u),0);
+const unreadL=()=>(D.letters||[]).filter(l=>!l.read).length;
 const pendTotal=()=>D.classes.reduce((a,c)=>a+pendOfKey(keyOf(c)),0);
 function toast(m){const t=document.getElementById('toast');t.innerHTML='<div class="toast">'+esc(m)+'</div>';clearTimeout(toast.h);toast.h=setTimeout(()=>t.innerHTML='',2400)}
 function clip(text){try{navigator.clipboard.writeText(text).then(()=>toast('コピーしました'),()=>toast('コピーできませんでした。下の欄から全選択してください'))}catch(e){toast('コピーできませんでした。下の欄から全選択してください')}}
@@ -146,7 +152,7 @@ function vHome(){
  const byCls={};D.classes.forEach(c=>(byCls[c.cls]=byCls[c.cls]||[]).push(c));
  const clsNames=Object.keys(byCls).sort();
  const multi=MULTI.includes(S.addRole);
- return hdr(false)+`<div class="greet">${BEAR}<div class="bub">お疲れさまです。${pt?`<b>コメント待ちの児童が${pt}人</b>います。`:'コメント待ちの児童は、いません。'}</div><div class="chips"><span class="chip ${pt?'red':''}">💌 コメント待ち ${pt}人</span><span class="chip">📝 本日の記入 38人</span><span class="chip">📅 本日の授業 3コマ</span></div></div>
+ return hdr(false)+`<div class="greet">${BEAR}<div class="bub">お疲れさまです。${pt?`<b>コメント待ちの児童が${pt}人</b>います。`:'コメント待ちの児童は、いません。'}${unreadL()?` <b>未読のお手紙が${unreadL()}通</b>たまっています。`:''}</div><div class="chips"><span class="chip ${pt?'red':''}">💌 コメント待ち ${pt}人</span><span class="chip ${unreadL()?'red':''}" data-act="letters" style="cursor:pointer">📮 お手紙 ${unreadL()?'未読 '+unreadL()+'通':'0通'}</span><span class="chip">📝 本日の記入 38人</span><span class="chip">📅 本日の授業 3コマ</span></div></div>
  ${clsNames.length?`<div class="grid">${clsNames.map(cn=>{const roles=[...new Set(byCls[cn].map(c=>c.role))];return `<div class="cls"><h3>${esc(cn)} <small>${esc(roles[0])}</small></h3>${byCls[cn].map(c=>{const k=keyOf(c),u=unitsOf(k)[0],pn=pendOfKey(k),th=SUBJ[c.subject]||['📘','#eee'];return `<button class="sj" style="background:${th[1]}" data-act="open" data-k="${esc(k)}">${th[0]} ${esc(c.subject)}${pn?`<span class="bd">あと${pn}人</span>`:''}<small>${esc(u.name)} ${u.periods.length}時間</small></button>`}).join('')}</div>`}).join('')}</div>`:'<div class="card">まだ授業が登録されていません。下の「授業を追加」から登録してください。</div>'}
  <div class="botrow">
   <div class="card"><div class="lbl" style="font-size:13px">➕ 授業を追加</div>
@@ -249,20 +255,30 @@ function vLib(){
  <div class="fld"><div class="lbl">教科・目的(補足)</div><input type="text" data-in="pf_purpose" value="${esc(f.purpose)}" placeholder="例:低学年向け/励ましつき"></div>
  <div class="fld"><div class="lbl">プロンプト本文(口調・観点・文字数など)</div><textarea rows="5" data-in="pf_body" placeholder="例:あなたは小学校の先生です。励ましを中心に、50〜80文字でコメントを返してください。">${esc(f.body)}</textarea></div>
  <div class="btns"><button class="btn" data-act="regP">登録する</button></div></div>`}
+function vLetters(){
+ const L=D.letters.slice().sort((a,b)=>a.daysAgo-b.daysAgo),un=unreadL(),old=D.letters.filter(l=>!l.read&&l.daysAgo>=3).length;
+ return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">📮 子どもからのお手紙</div><div class="hint" style="margin:0 0 8px">あなたを選んだ児童からのお手紙です。<b>ほかの先生や管理者には表示されません。</b>評価ではなく、気持ちを受け止めるためのものです。児童の画面では、先生のお名前が表示されてから送られています。</div>
+ ${old?`<div class="warn" style="border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700;margin-bottom:8px">⏰ 3日以上たっている未読のお手紙が${old}通あります。</div>`:''}
+ ${L.length?L.map(l=>`<div class="pr" style="${l.read?'':'border-color:#FF5A5F;background:#FFF7F5'}"><div class="prh">${l.read?'':'<span class="mini2" style="background:#FF5A5F;color:#fff">未読</span>'}<b>${l.from}さん</b><span class="mini2">${l.cls}</span><span class="mini2" style="background:${l.kind=='reply'?'#FFE0D2':'#E6E0FF'}">${l.kind=='reply'?'💬 おへんじがほしい':'🤍 きいてほしいだけ'}</span><span class="hint" style="margin:0 0 0 auto">${l.date}(${l.daysAgo}日前)</span></div>
+ <div style="font-size:14px;line-height:1.8;margin:8px 0;background:#fff;border-radius:12px;padding:8px 12px">${esc(l.text)}</div>
+ ${l.reply?`<div style="font-size:13px;line-height:1.7;background:#F1F8EC;border-radius:12px;padding:8px 12px;margin-bottom:6px"><b style="color:#3d7a35">あなたの返事</b><br>${esc(l.reply)}</div>`:''}
+ ${S.openL===l.id?`<textarea rows="3" data-in="replyText" placeholder="返事を書きます(児童には「せんせいから おてがみ きてるよ」と表示されます)">${esc(S.replyText)}</textarea><div class="btns" style="margin-top:6px"><button class="btn sm" data-act="sendL" data-id="${l.id}">返事を送る</button><button class="btn w sm" data-act="cancelL">やめる</button></div>`:`<div class="btns" style="margin:0">${l.read?'':`<button class="btn w sm" data-act="readL" data-id="${l.id}">✓ 読みました</button>`}${l.reply?'':`<button class="btn w sm" data-act="replyL" data-id="${l.id}">✏️ 返事を書く${l.kind=='listen'?'(必須ではありません)':''}</button>`}</div>`}</div>`).join(''):'<div class="hint">お手紙は届いていません。</div>'}
+ <div class="hint" style="margin-top:10px">必要なときは、直接、管理職や養護教諭の先生に相談してください。お手紙は、ふりかえりやGeminiへのコピーには含まれません。</div></div>`}
 function vAsk(){return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">❓ 質問する</div><div class="hint" style="margin:0 0 8px">使い方で分からないことを自由に書いてください。アプリの説明といっしょにコピーされるので、いつものようにGeminiに貼り付ければ、答えが返ってきます。</div><div class="lbl">質問</div><textarea rows="4" data-in="ask" placeholder="例:課題リンクにチェックを付けさせたいけど、どこで設定するの?">${esc(S.ask)}</textarea><div class="btns"><button class="btn" data-act="copyAsk">質問をコピーする</button></div>${S.askOut?`<div class="fld"><div class="lbl">コピーされる内容(うまくコピーできないときは、ここから全選択)</div><textarea rows="6" readonly data-sel="1">${esc(S.askOut)}</textarea></div>`:''}</div>`}
 function vGuide(){return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">❓ 使い方ガイド</div><div class="lbl">🎬 3分で分かる操作デモ</div><div class="demo-box">(操作デモの動画がここに入ります)</div><div class="lbl" style="margin-top:14px">🔰 初めての方はここから(4ステップ)</div><div class="gd"><div class="gc"><b>① 授業を追加</b><span>ホームから、自分のクラスと教科を登録</span></div><div class="gc"><b>② 単元を作る</b><span>クラスを開いて、単元名を入力</span></div><div class="gc"><b>③ めあてを設定</b><span>時数ごとに入力して「クラス全員に設定」</span></div><div class="gc"><b>④ 児童にURLを伝える</b><span>児童がログインすれば、自分のクラスが出ます</span></div></div></div>
  <div class="card"><div class="ttl">✨ あると便利な機能</div><div class="gd">${[['🚫 欠席チェック','欠席の児童を評価対象外にできる'],['✏️ 自分でまとめて書く','AIを使わず、一覧を見ながらコメントを書ける'],['🤖 Geminiでコメント','コピー→Gemに貼り付け→確認→反映'],['📚 プロンプトライブラリ','先生同士でプロンプトを共有・検索'],['📤 同学年へ反映','他クラスにめあてを一括コピー'],['🧭 学びの軌跡','1人の児童の記録を時系列で見られる'],['👀 みんなのふりかえり','他の児童のふりかえりを匿名/実名で見せられる'],['🔍 児童プレビュー','児童から見た画面を確認(テスト用)']].map(([a,b])=>`<div class="gc w"><b>${a}</b><span>${b}</span></div>`).join('')}</div></div>`}
 function vRemove(){return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">授業を削除</div><div class="hint" style="margin:0 0 8px">削除したいクラスと教科を選んでください。単元やふりかえりなどのデータは消えません。間違えて削除しても、同じクラスと教科でもう一度登録すれば、元どおり使えます。</div>${D.classes.length?D.classes.map((c,i)=>`<div class="row"><div class="rb"><b>${esc(c.cls)}</b>　${esc(c.subject)}<span class="cnt">(${esc(c.role)})</span></div>${S.confirm===i?`<span class="hint" style="margin:0">本当に削除しますか?</span><button class="btn w sm red" data-act="doRemove" data-i="${i}">削除する</button><button class="btn w sm" data-act="noRemove">やめる</button>`:`<button class="btn w sm red" data-act="askRemove" data-i="${i}">削除する</button>`}</div>`).join(''):'<div class="hint">登録されている授業がありません。</div>'}</div>`}
 function render(){
  const app=document.getElementById('app'),sc=window.scrollY;
- app.innerHTML=S.view=='home'?vHome():S.view=='class'?vClass():S.view=='lib'?vLib():S.view=='ask'?vAsk():S.view=='guide'?vGuide():vRemove();
+ app.innerHTML=S.view=='home'?vHome():S.view=='letters'?vLetters():S.view=='class'?vClass():S.view=='lib'?vLib():S.view=='ask'?vAsk():S.view=='guide'?vGuide():vRemove();
  window.scrollTo(0,sc)}
 // ---------- events
 const go=v=>{S.view=v;window.scrollTo(0,0);render()};
 const P=()=>curUnit().periods[S.period-1];
 const A={
+ readL:d=>{D.letters.find(l=>l.id==+d.id).read=true;render()},replyL:d=>{S.openL=+d.id;S.replyText='';D.letters.find(l=>l.id==+d.id).read=true;render()},cancelL:()=>{S.openL=null;render()},sendL:d=>{if(!S.replyText.trim()){toast('返事を入力してください');return}D.letters.find(l=>l.id==+d.id).reply=S.replyText.trim();S.openL=null;render();toast('返事を送りました')},
  reset:()=>{reset();render();toast('最初の状態に戻しました')},
- home:()=>go('home'),guide:()=>go('guide'),ask:()=>go('ask'),library:()=>go('lib'),remove:()=>go('remove'),
+ home:()=>go('home'),letters:()=>go('letters'),guide:()=>go('guide'),ask:()=>go('ask'),library:()=>go('lib'),remove:()=>go('remove'),
  open:d=>{S.key=d.k;S.tab='goal';S.ui=0;S.period=1;S.manual=false;S.review=null;S.gem='';S.pasted='';S.warn='';go('class')},
  tab:d=>{S.tab=d.t;S.manual=false;S.review=null;render()},
  per:d=>{S.period=+d.n;S.manual=false;S.review=null;S.gem='';S.pasted='';S.warn='';render()},
@@ -309,7 +325,7 @@ const IN={
  rev:(v,el)=>S.review[+el.dataset.i].feedback=v,
  newUnit:v=>S.newUnit=v,copySrc:v=>{S.copySrc=v;render()},goals:v=>curUnit().goals=v,
  pquery:v=>{S.pquery=v;render();const i=document.querySelector('[data-in=pquery]');if(i){i.focus();i.setSelectionRange(v.length,v.length)}},fs:v=>{S.fs=v;render()},fg:v=>{S.fg=v;render()},
- editPBody:v=>S.editPBody=v,pickp:v=>{S.lastP[S.key]=v;S.gem='';render()},pf_name:v=>S.pform.name=v,pf_subject:v=>S.pform.subject=v,pf_purpose:v=>S.pform.purpose=v,pf_body:v=>S.pform.body=v,ask:v=>S.ask=v
+ editPBody:v=>S.editPBody=v,replyText:v=>S.replyText=v,pickp:v=>{S.lastP[S.key]=v;S.gem='';render()},pf_name:v=>S.pform.name=v,pf_subject:v=>S.pform.subject=v,pf_purpose:v=>S.pform.purpose=v,pf_body:v=>S.pform.body=v,ask:v=>S.ask=v
 };
 const SELECTS=['addRole','addClass','addSubject','unit','copySrc','fs','fg','pformat','ppeermode','pf_subject','pickp'];
 const CHECKS=['peval','pcheck','ppeer','pprog','absent'];
