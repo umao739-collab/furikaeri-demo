@@ -102,12 +102,13 @@ textarea{width:100%;min-height:96px;border:2px solid #F3E2BC;background:#FFFBF0;
 <div class="wrapx">
 <div class="col"><div class="phone" id="ph"></div></div>
 <div class="side"><h3>見本の操作(本番にはありません)</h3>
-<button data-d="reset">↺ はじめから</button>
-<button data-d="star">⭐ 星がたまった状態から(2ひき・飾りあり)</button>
-<button data-d="two">🐾 あと1回保存すると2ひきめが来る状態にする</button>
+<button data-d="reset">↺ はじめから(星0・1ひき)</button>
+<button data-d="star">⭐ 星70の状態から(2ひき・飾りあり)</button>
+<button data-d="two">🐾 あと1回保存すると2ひきめが選べる状態にする</button>
+<button data-d="three">🐾 あと1回保存すると3びきめが選べる状態にする</button>
+<button data-d="mate">👥 あと1回保存するとコアラが来る状態にする</button>
 <button data-d="deco">🎁 あと1回保存すると飾りが届く状態にする</button>
-<button data-d="mate">👥 あと1回保存すると新しいなかまが来る状態にする(2ひき→入れかえ)</button>
-<button data-d="done">🎉 あと1回保存するとお部屋かんせいの状態にする</button>
+<button data-d="done">🎉 あと1回保存するとお部屋かんせい(→2ひきめも)の状態にする</button>
 <div>流れ:ホーム → 国語 → 3時間め or 4時間め → 保存 → ホーム。<br>ふりかえり欄を空にして保存すると、星は増えません。<br>お部屋の飾りも、なかまも、ホームでそのままドラッグできます。<br>2ひきいるときは、ときどき2ひきで会話します(しばらく待つか、なかまをタップしてみてください)。</div></div>
 </div>
 <script>
@@ -187,11 +188,13 @@ const POS={rug:[50,88],picture:[50,20],sofa:[34,80],window:[84,32],plant:[72,76]
 const THEMES={house:'linear-gradient(180deg,#FFEFC9 0 56%,#E0B27A 56% 100%)',forest:'linear-gradient(180deg,#CFEFD2 0 56%,#8FC37A 56% 100%)',sea:'linear-gradient(180deg,#BFE6F7 0 56%,#F4E2AE 56% 100%)',space:'linear-gradient(180deg,#2B2F6B,#5B4A9C)',sweets:'linear-gradient(180deg,#FFE0EE 0 56%,#F5C6A5 56% 100%)'};
 const PER=[{n:1,d:'10/21',g:'ものがたりの じょうけいを つかもう'},{n:2,d:'10/23',g:'ごんの ぎもんを みつけよう'},{n:3,d:'10/28',g:'ごんの きもちを かんがえよう'},{n:4,d:'10/30',g:'ごんと ひょうじゅうの かんけいを まとめよう'}];
 const SAMPLE='ごんが ひょうじゅうに つぐないを するところで、ごんの さみしさが わかった。';
-const MATES=[['bear',0],['cat',0],['rabbit',0],['dog',10],['chick',25],['hamster',40],['lion',60],['koala',85],['elephant',110]];
-const SLOTS=()=>ST.stars>=10?2:1;
+const MATES=[['bear',0],['cat',0],['rabbit',0],['dog',5],['chick',10],['lion',25],['hamster',40],['koala',85],['elephant',110]];
+const SLOTS=()=>ST.stars>=130?3:ST.stars>=60?2:1;
+const cnt=n=>n==3?'3びき':n+'ひき';
+const nextEvent=()=>ST.newMate?'mate':(ST.newSlot?'slot':'home');
 const unlocked=()=>MATES.filter(([k,n])=>ST.stars>=n).map(a=>a[0]);
 let ST,LAY;
-function init(){ST={types:['bear'],stars:0,roomStart:0,theme:'house',written:{},screen:'picker',first:true,newIdx:-1,eval:'◎',n:3,seen:[],newMate:null};ST.seen=unlocked();LAY=JSON.parse(JSON.stringify(POS))}
+function init(){ST={types:['bear'],stars:0,roomStart:0,theme:'house',written:{},screen:'picker',first:true,newIdx:-1,eval:'◎',n:3,seen:[],newMate:null,newSlot:false};ST.seen=unlocked();LAY=JSON.parse(JSON.stringify(POS))}
 init();
 const PH=document.getElementById('ph');
 const $=s=>PH.querySelector(s);
@@ -199,10 +202,10 @@ const nItems=()=>ST.theme=='house'?Math.min(12,Math.floor((ST.stars-ST.roomStart
 const unwritten=()=>PER.filter(p=>!ST.written[p.n]).length;
 function head(back){return `<div class="top">${back?'<button class="btn sm" data-act="back">← もどる</button>':'<div><div class="hello">たろうさん、こんにちは!</div><div class="ttl">🏠 なかまの おへや</div></div>'}<div class="stars">⭐ ${ST.stars}</div></div>`}
 const SCR={
- picker:()=>`<div class="center" style="padding-top:8px"><div class="big" style="font-size:20px">${SLOTS()==1?'いっしょに すごす なかまを えらぼう!':'なかまを 2ひきまで えらぼう!'}</div><div style="font-size:12px;font-weight:700">あとから かえられるよ</div></div>
+ picker:()=>`<div class="center" style="padding-top:8px"><div class="big" style="font-size:20px">${SLOTS()==1?'いっしょに すごす なかまを えらぼう!':'なかまを '+cnt(SLOTS())+'まで えらぼう!'}</div><div style="font-size:12px;font-weight:700">あとから かえられるよ</div></div>
   <div class="cg">${unlocked().map(k=>`<div data-act="pick" data-t="${k}" class="${ST.types.includes(k)?'on':''}" style="position:relative">${ST.seen.includes(k)?'':'<span style="position:absolute;top:-6px;right:-4px;background:#E8483A;color:#fff;font-size:11px;padding:2px 8px;border-radius:999px;z-index:2">NEW</span>'}${charSVG(k)}${COL[k][2]}</div>`).join('')}</div>
-  <div class="center" style="font-size:13px;font-weight:900;margin-top:10px">${ST.types.length} / ${SLOTS()} ひき えらんだよ</div>
-  <button class="btn b2 full" style="margin-top:6px;${ST.types.length>=1?'':'opacity:.5'}" data-act="startOK">${ST.types.length==2?'この 2ひきと すごす!':'この子と すごす!'}</button>`,
+  <div class="center" style="font-size:13px;font-weight:900;margin-top:10px">${ST.types.length} / ${SLOTS()} えらんだよ</div>
+  <button class="btn b2 full" style="margin-top:6px;${ST.types.length>=1?'':'opacity:.5'}" data-act="startOK">${ST.types.length>=2?'この '+cnt(ST.types.length)+'と すごす!':'この子と すごす!'}</button>`,
  home:()=>`${head(false)}<div id="room" style="height:250px"></div>
   <div class="hint" style="margin:6px 0 0">👆 かざりも なかまも ドラッグして うごかせるよ</div><div class="btns"><button class="btn" data-act="companion">🐾 なかま</button></div>
   <div class="grid">
@@ -219,15 +222,16 @@ const SCR={
   <div class="card"><div class="lbl">⭐ 自分で ふりかえろう</div><div class="sel">${['◎','○','△'].map(v=>`<span data-act="eval" data-v="${v}" class="${ST.eval==v?'on':''}">${v}</span>`).join('')}</div>
   <div class="lbl" style="margin-top:10px">✏️ ふりかえり</div><textarea id="ta" placeholder="きょうの じゅぎょうで おもったことを かいてね">${ST.draft===undefined?SAMPLE:ST.draft}</textarea></div>
   <button class="btn b2 full" data-act="save">💾 ふりかえりを保存</button>`},
- saved:()=>`<div class="center" style="padding-top:50px"><div class="pop" style="display:flex;justify-content:center;gap:6px">${ST.types.map(t=>`<div style="width:110px">${charSVG(t)}</div>`).join('')}</div><div class="big">ふりかえり ほぞんしたよ!</div><div class="plus">⭐ +1</div></div><button class="btn b2 full" style="margin-top:80px" data-act="afterSaved">つぎへ</button>`,
+ saved:()=>`<div class="center" style="padding-top:50px"><div class="pop" style="display:flex;justify-content:center;gap:6px">${ST.types.map(t=>`<div style="width:${ST.types.length>2?92:110}px">${charSVG(t)}</div>`).join('')}</div><div class="big">ふりかえり ほぞんしたよ!</div><div class="plus">⭐ +1</div></div><button class="btn b2 full" style="margin-top:80px" data-act="afterSaved">つぎへ</button>`,
  deco:()=>`<div class="center" style="padding-top:20px"><div class="pop" style="font-size:54px">🎁</div><div class="big" style="font-size:20px">あたらしい かざりが とどいたよ!</div></div><div id="room" style="height:250px;margin-top:8px"></div><div class="center" style="font-size:13px;font-weight:700;margin-top:8px">なにが きたかな? お部屋に おいたよ!</div><button class="btn b2 full" data-act="afterDeco">ホームにもどる</button>`,
  complete:()=>`<div class="center" style="padding-top:16px"><div class="pop" style="font-size:54px">🎉🏠🎉</div><div class="big">お部屋が かんせい!</div><div style="font-size:13px;font-weight:700">つぎは どんな お部屋にする?</div></div>
   <div class="pick">${[['forest','🌲','もり','#CFEFD2'],['sea','🌊','うみ','#BFE6F7'],['space','🚀','うちゅう','#C9C6F5'],['sweets','🍰','おかし','#FFD6E8']].map(a=>`<div class="theme" data-act="theme" data-t="${a[0]}" style="background:${a[3]}"><span class="e">${a[1]}</span>${a[2]}</div>`).join('')}</div>
   <div class="center" style="font-size:11px;color:#7a7a72;margin-top:12px;font-weight:700">かんせいした お部屋は「アルバム」で いつでも見られるよ</div>`,
- mate:()=>`<div class="center" style="padding-top:20px"><div class="pop" style="font-size:54px">🎁</div><div class="big" style="font-size:20px">${ST.types.length<SLOTS()?'2ひきめの なかまが きたよ!':'あたらしい なかまが きたよ!'}</div></div><div class="center" style="width:150px;margin:6px auto 0">${charSVG(ST.newMate)}</div><div class="center big" style="font-size:20px;margin-top:6px">${COL[ST.newMate][2]}</div><button class="btn b2 full" style="margin-top:14px" data-act="mateNow">${ST.types.length<SLOTS()?'いっしょに すごす':'いっしょに すごす なかまを えらぶ'}</button><button class="btn full" style="margin-top:8px" data-act="mateLater">あとで(「🐾 なかま」で あえるよ)</button>`,
+ mate:()=>`<div class="center" style="padding-top:20px"><div class="pop" style="font-size:54px">🎁</div><div class="big" style="font-size:20px">あたらしい なかまが きたよ!</div></div><div class="center" style="width:150px;margin:6px auto 0">${charSVG(ST.newMate)}</div><div class="center big" style="font-size:20px;margin-top:6px">${COL[ST.newMate][2]}</div><button class="btn b2 full" style="margin-top:14px" data-act="mateNow">${ST.types.length<SLOTS()?'いっしょに すごす':'いっしょに すごす なかまを えらぶ'}</button><button class="btn full" style="margin-top:8px" data-act="mateLater">あとで(「🐾 なかま」で あえるよ)</button>`,
+ slot:()=>`<div class="center" style="padding-top:20px"><div class="pop" style="font-size:54px">🎉</div><div class="big" style="font-size:20px">${cnt(SLOTS())}めの なかまを むかえられるよ!</div><div style="font-size:13px;font-weight:700;margin-top:8px">いま えらべる なかまから、すきな子を えらんでね</div></div><div class="cg" style="margin-top:12px">${unlocked().filter(k=>!ST.types.includes(k)).slice(0,3).map(k=>`<div style="cursor:default">${charSVG(k)}${COL[k][2]}</div>`).join('')}</div><button class="btn b2 full" style="margin-top:14px" data-act="slotGo">なかまを えらぶ</button>`,
  edit:()=>`<div class="top"><div class="ttl">🎨 もようがえ</div><div class="stars">⭐ ${ST.stars}</div></div><div id="room" class="edit" style="height:300px"></div><div class="card" style="font-size:12px;font-weight:700">👆 ドラッグして すきなところへ</div><div class="btns"><button class="btn" data-act="editReset">↩ もとにもどす</button><button class="btn b2" data-act="editDone" style="background:#E8734A;color:#fff">✅ かんりょう</button></div>`
 };
-let CUR=null;const SS=[0,1].map(()=>({x:0,y:0,tx:0,ty:0,mode:'idle',t:1,dir:1}));
+let CUR=null;const SS=[0,1,2].map(()=>({x:0,y:0,tx:0,ty:0,mode:'idle',t:1,dir:1}));
 function render(){
  CUR=null;PH.innerHTML=SCR[ST.screen]();if(ST.screen=='picker')ST.seen=unlocked();
  const r=$('#room');if(r)mount(r,ST.screen=='home',ST.screen=='deco'?ST.newIdx:-1);
@@ -243,7 +247,7 @@ function mount(room,edit,newIdx){
  for(let i=0;i<n;i++){const k=ORDER[i],d=document.createElement('div');d.className='it'+(i==newIdx?' new':'');d.style.width=ITEMS[k].w+'px';d.innerHTML=ITEMS[k].svg;d.dataset.i=i;placeIt(d,LAY[k][0],LAY[k][1],k);room.appendChild(d)}
  CUR={room,RW,RH,chs:[]};
  ST.types.forEach((t,i)=>{const s=SS[i],ch=document.createElement('div');ch.className='ch idle';ch.dataset.ci=i;ch.innerHTML='<div class="in">'+charSVG(t)+'</div>';room.appendChild(ch);
-  if(!s.x||s.x>RW)s.x=RW*(ST.types.length==1?.5:(i?.68:.32));s.y=Math.max(RH*.66,Math.min(RH*.94,s.y||RH*(i?.86:.92)));s.mode='idle';s.t=1+i*1.3;
+  if(!s.x||s.x>RW)s.x=RW*({1:[.5],2:[.32,.68],3:[.2,.5,.8]}[ST.types.length][i]);s.y=Math.max(RH*.66,Math.min(RH*.94,s.y||RH*[.92,.86,.9][i]));s.mode='idle';s.t=1+i*1.3;
   CUR.chs.push({ch,s,busy:false})});
  const tap=c=>{setMode(c,'idle');c.s.t=2;c.ch.classList.add('jump');setTimeout(()=>c.ch.classList.remove('jump'),600);say(c);for(let i=0;i<3;i++){const h=document.createElement('div');h.className='heart';h.textContent='💗';h.style.left=(20+i*25)+'px';h.style.top='-6px';h.style.animationDelay=i*.12+'s';c.ch.appendChild(h);setTimeout(()=>h.remove(),1500)}};
  if(edit){
@@ -265,7 +269,7 @@ function setMode(c,m){c.s.mode=m;const ch=c.ch;ch.classList.remove('idle','walk'
 const SAY=['きょうも がんばろう!','いっしょに いるよ','おはなし きかせてね','ゆっくりで だいじょうぶ','きょうは どんな ことが あったかな?','かんがえるって たのしいね','おへや いい かんじだね','ふぅ… ちょっと ひとやすみ','ふりかえり かけたら おしえてね','ありがとう!'];
 let lastSay=-1,lastTalk=-1;
 const TALK=[['なんだか ほっと するね','うん、ここ すきだな'],['きょうは なにを かこうかな?','ゆっくり かんがえて いいよ'],['おへや あたたかい ね','うん、いい かんじ'],['ねむく なってきた…','すこし やすもうか'],['いっしょに いると たのしいね','うん! いっしょ だね'],['ふりかえり できたら おしえてね','たのしみに してるよ'],['おなか すいた ね','おやつの じかん かな?'],['ねえ ねえ ききたい ことが あるの','なあに? きかせて']];
-function chat(){if(!CUR||CUR.chs.length<2)return;const [p,q]=CUR.chs.slice().sort((a,b)=>a.s.x-b.s.x);if(CUR.chs.some(c=>c.busy||c.s.mode=='sleep'||c.ch.querySelector('.say-b')))return;
+function chat(){if(!CUR||CUR.chs.length<2)return;if(CUR.chs.some(c=>c.busy||c.ch.querySelector('.say-b')))return;const aw=CUR.chs.filter(c=>c.s.mode!='sleep');if(aw.length<2)return;const pr=aw.slice().sort(()=>Math.random()-.5).slice(0,2).sort((a,b)=>a.s.x-b.s.x),p=pr[0],q=pr[1];
  let i;do{i=Math.floor(Math.random()*TALK.length)}while(i===lastTalk);lastTalk=i;
  [p,q].forEach(c=>{setMode(c,'idle');c.s.t=7});p.s.dir=1;q.s.dir=-1;
  say(p,TALK[i][0]);setTimeout(()=>{if(CUR&&CUR.chs.includes(q)&&q.ch.isConnected)say(q,TALK[i][1])},2300)}
@@ -290,12 +294,13 @@ const ACT={
  eval:a=>{ST.draft=$('#ta').value;ST.eval=a.dataset.v;render()},
  back:()=>{ST.screen=ST.screen=='write'?'subject':'home';render()},
  save:()=>{const v=$('#ta').value.trim();if(!v){toast('なにか かいてから ほぞんしてね');return}
-  const before=nItems();ST.written[ST.n]=1;ST.stars++;ST.draft=undefined;ST.newIdx=nItems()>before?nItems()-1:-1;const nm=MATES.find(([k,n])=>n>0&&n<=ST.stars&&!ST.seen.includes(k));ST.newMate=nm?nm[0]:null;ST.screen='saved';render()},
- afterSaved:()=>{ST.screen=ST.newIdx>=0?'deco':(ST.newMate?'mate':'home');render()},
- afterDeco:()=>{ST.screen=nItems()>=12?'complete':(ST.newMate?'mate':'home');render()},
- mateNow:()=>{if(ST.types.length<SLOTS()){ST.types.push(ST.newMate);ST.seen=unlocked();ST.newMate=null;ST.screen='home'}else{ST.types=[ST.types[ST.types.length-1],ST.newMate];ST.seen=unlocked();ST.newMate=null;ST.screen='picker'}render()},
- mateLater:()=>{ST.newMate=null;ST.screen='home';render()},
- theme:a=>{ST.theme=a.dataset.t;ST.roomStart=ST.stars;ST.screen=ST.newMate?'mate':'home';render()},
+  const before=nItems(),sb=SLOTS();ST.written[ST.n]=1;ST.stars++;ST.newSlot=SLOTS()>sb;ST.draft=undefined;ST.newIdx=nItems()>before?nItems()-1:-1;const nm=MATES.find(([k,n])=>n>0&&n<=ST.stars&&!ST.seen.includes(k));ST.newMate=nm?nm[0]:null;ST.screen='saved';render()},
+ afterSaved:()=>{ST.screen=ST.newIdx>=0?'deco':nextEvent();render()},
+ afterDeco:()=>{ST.screen=nItems()>=12?'complete':nextEvent();render()},
+ mateNow:()=>{const free=ST.types.length<SLOTS();ST.types.push(ST.newMate);while(ST.types.length>SLOTS())ST.types.shift();ST.seen=unlocked();ST.newMate=null;ST.screen=free?nextEvent():'picker';render()},
+ mateLater:()=>{ST.newMate=null;ST.screen=nextEvent();render()},
+ slotGo:()=>{ST.newSlot=false;ST.screen='picker';render()},
+ theme:a=>{ST.theme=a.dataset.t;ST.roomStart=ST.stars;ST.screen=nextEvent();render()},
  edit:()=>{ST.screen='edit';render()},
  editDone:()=>{ST.screen='home';render()},
  editReset:()=>{LAY=JSON.parse(JSON.stringify(POS));render()}
@@ -303,11 +308,12 @@ const ACT={
 PH.addEventListener('click',e=>{const a=e.target.closest('[data-act]');if(a&&ACT[a.dataset.act])ACT[a.dataset.act](a)});
 document.querySelectorAll('.side [data-d]').forEach(b=>b.onclick=()=>{const d=b.dataset.d;
  if(d=='reset'){init();ST.screen='picker'}
- if(d=='star'){init();ST.screen='home';ST.first=false;ST.stars=38;ST.types=['bear','cat'];ST.written={1:1,2:1};ST.seen=unlocked()}
- if(d=='two'){init();ST.screen='home';ST.first=false;ST.stars=9;ST.seen=unlocked()}
- if(d=='deco'){init();ST.screen='home';ST.first=false;ST.stars=39;ST.types=['bear','cat'];ST.written={1:1,2:1}}
- if(d=='mate'){init();ST.screen='home';ST.first=false;ST.stars=24;ST.types=['bear','cat'];ST.written={1:1,2:1};ST.seen=unlocked()}
- if(d=='done'){init();ST.screen='home';ST.first=false;ST.stars=59;ST.types=['bear','cat'];ST.written={1:1,2:1,3:1}}
+ if(d=='star'){init();ST.screen='home';ST.first=false;ST.stars=70;ST.roomStart=55;ST.types=['bear','cat'];ST.written={1:1,2:1};ST.seen=unlocked()}
+ if(d=='two'){init();ST.screen='home';ST.first=false;ST.stars=59;ST.roomStart=56;ST.seen=unlocked()}
+ if(d=='three'){init();ST.screen='home';ST.first=false;ST.stars=129;ST.roomStart=126;ST.types=['bear','cat'];ST.seen=unlocked()}
+ if(d=='deco'){init();ST.screen='home';ST.first=false;ST.stars=39;ST.written={1:1,2:1};ST.seen=unlocked()}
+ if(d=='mate'){init();ST.screen='home';ST.first=false;ST.stars=84;ST.roomStart=81;ST.types=['bear','cat'];ST.seen=unlocked()}
+ if(d=='done'){init();ST.screen='home';ST.first=false;ST.stars=59;ST.written={1:1,2:1,3:1};ST.seen=unlocked()}
  render()});
 render();
 </script>
