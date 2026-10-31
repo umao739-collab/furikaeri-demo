@@ -117,6 +117,23 @@ textarea{min-height:140px;font-size:16px}
 .demo .dbtns button{margin:0;border:0;border-radius:12px;background:#fff;padding:8px 10px;font:inherit;font-weight:700;font-size:12px;cursor:pointer;text-align:left}
 .demo .dbtns div{grid-column:1/-1;color:#e6e2d8}
 @media(max-width:860px){.homeg{grid-template-columns:1fr}.phone{padding:16px 14px 20px}}
+
+.lscene{position:relative;height:210px;margin-top:10px;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,#DFF1FF 0 62%,#BFE3A0 62% 100%);box-shadow:inset 0 0 0 4px rgba(255,255,255,.7);cursor:pointer}
+.lmail{position:absolute;right:7%;bottom:30px;text-align:center;font-weight:900;font-size:13px;color:#7a4b2a}
+.lmail .mb{font-size:64px;line-height:1;display:block}
+.lmail.got .mb{animation:lbounce .6s}
+@keyframes lbounce{30%{transform:scale(1.2,.85)}60%{transform:scale(.92,1.1)}100%{transform:none}}
+.lch{position:absolute;bottom:22px;left:6%;width:104px;animation:lwalk 3s ease-in-out .7s both}
+@keyframes lwalk{from{left:6%}to{left:56%}}
+.lch .in{transform-origin:50% 100%}
+.lch svg{display:block;width:100%;height:auto;overflow:visible}
+.lenv{position:absolute;left:62%;top:-4px;font-size:34px;animation:lpop .5s both}
+@keyframes lpop{from{scale:0;opacity:0}to{scale:1;opacity:1}}
+.lenv.drop{animation:ldrop .7s forwards}
+@keyframes ldrop{to{translate:78px -6px;scale:.25;opacity:0}}
+.lspark{position:absolute;right:9%;bottom:104px;font-size:26px;animation:lspark 1.2s forwards}
+@keyframes lspark{0%{opacity:0;transform:translateY(8px)}30%{opacity:1}100%{opacity:0;transform:translateY(-18px)}}
+.lmsg{opacity:0;transition:opacity .8s;pointer-events:none}.lmsg.show{opacity:1;pointer-events:auto}
 </style>
 
 <div class="wrapx">
@@ -262,12 +279,25 @@ const SCR={
   <div class="lbl" style="margin-top:10px">どうしてほしい?</div><div class="sel" style="gap:8px"><span data-act="lkind" data-v="reply" class="${ST.kind=='reply'?'on':''}" style="font-size:14px;padding:12px 4px">💬 おへんじが ほしい</span><span data-act="lkind" data-v="listen" class="${ST.kind=='listen'?'on':''}" style="font-size:14px;padding:12px 4px">🤍 きいてくれるだけで いい</span></div></div>
   <div class="center" style="font-size:12px;font-weight:700;color:#8a6a2b;margin-top:8px">せんせいは、すぐには よめない ときも あるよ</div>
   <button class="btn b2 full" data-act="letterSend">📮 おくる</button>`,
- letterSent:()=>`<div class="center" style="padding-top:40px"><div class="pop" style="width:130px;margin:auto">${charSVG(ST.types[0])}</div><div class="big">おしえてくれて ありがとう</div><div style="font-size:14px;font-weight:700">${ST.to.n}に とどけたよ</div></div><button class="btn b2 full" style="margin-top:60px" data-act="letterHomeGo">おてがみの ページへ</button><button class="btn full" data-act="back">ホームにもどる</button>`,
+ letterSent:()=>`<div class="lscene" id="ls"><div class="lmail"><span class="mb">📮</span>${ST.to.n}</div><div class="lch walk"><div class="in">${charSVG(ST.types[0])}</div><div class="lenv">💌</div></div></div>
+  <div class="lmsg"><div class="center" style="padding-top:14px"><div class="big">おしえてくれて ありがとう</div><div style="font-size:14px;font-weight:700">${ST.to.n}に とどけたよ</div></div><button class="btn b2 full" style="margin-top:18px" data-act="letterHomeGo">おてがみの ページへ</button><button class="btn full" data-act="back">ホームにもどる</button></div>`,
  edit:()=>`<div class="top"><div class="ttl">🎨 もようがえ</div><div class="stars">⭐ ${ST.stars}</div></div><div id="room" class="edit" style="height:300px"></div><div class="card" style="font-size:12px;font-weight:700">👆 ドラッグして すきなところへ</div><div class="btns"><button class="btn" data-act="editReset">↩ もとにもどす</button><button class="btn b2" data-act="editDone" style="background:#E8734A;color:#fff">✅ かんりょう</button></div>`
 };
 let CUR=null;const SS=[0,1,2].map(()=>({x:0,y:0,tx:0,ty:0,mode:'idle',t:1,dir:1}));
+const LT=[];
+function startLetterAnim(){const sc=$('#ls');if(!sc)return;const ch=sc.querySelector('.lch'),env=sc.querySelector('.lenv'),mail=sc.querySelector('.lmail'),msg=$('.lmsg'),T=(f,ms)=>LT.push(setTimeout(f,ms));
+ const face=()=>{ch.classList.remove('walk');ch.classList.add('idle');ch.querySelector('.in').style.transform='scaleX(-1)'};
+ const fin=()=>{LT.forEach(clearTimeout);LT.length=0;face();ch.style.animation='none';ch.style.left='56%';env.remove();mail.classList.add('got');msg.classList.add('show');sc.onclick=null};
+ if(matchMedia('(prefers-reduced-motion:reduce)').matches){fin();return}
+ T(()=>env.classList.add('drop'),3700);
+ T(()=>{mail.classList.add('got');sc.insertAdjacentHTML('beforeend','<div class="lspark">✨</div>')},4150);
+ T(()=>{face();ch.classList.add('jump');for(let i=0;i<3;i++){const h=document.createElement('div');h.className='heart';h.textContent='💗';h.style.left=(20+i*25)+'px';h.style.top='-6px';h.style.animationDelay=i*.12+'s';ch.appendChild(h);setTimeout(()=>h.remove(),1500)}},4400);
+ T(()=>msg.classList.add('show'),5000);
+ sc.onclick=fin}
 function render(){
+ LT.forEach(clearTimeout);LT.length=0;
  CUR=null;PH.innerHTML=ST.screen=='home'?SCR.home():'<div class="narrow">'+SCR[ST.screen]()+'</div>';if(ST.screen=='picker')ST.seen=unlocked();
+ if(ST.screen=='letterSent')startLetterAnim();
  const r=$('#room');if(r)mount(r,ST.screen=='home',ST.screen=='deco'?ST.newIdx:-1);
  if(ST.screen=='home'&&ST.first){ST.first=false}
  if(ST.screen=='home'&&ST.replyArrived&&CUR)setTimeout(()=>{if(CUR&&ST.screen=='home'&&ST.replyArrived)say(CUR.chs[0],'せんせいから おてがみ きてるよ')},900);
