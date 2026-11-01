@@ -154,7 +154,6 @@ function vHome(){
  const multi=MULTI.includes(S.addRole);
  return hdr(false)+`<div class="greet">${BEAR}<div class="bub">お疲れさまです。${pt?`<b>コメント待ちの児童が${pt}人</b>います。`:'コメント待ちの児童は、いません。'}${unreadL()?` <b>未読のお手紙が${unreadL()}通</b>たまっています。`:''}</div><div class="chips"><span class="chip ${pt?'red':''}">💌 コメント待ち ${pt}人</span><span class="chip ${unreadL()?'red':''}" data-act="letters" style="cursor:pointer">📮 お手紙 ${unreadL()?'未読 '+unreadL()+'通':'0通'}</span><span class="chip">📝 本日の記入 38人</span><span class="chip">📅 本日の授業 3コマ</span></div></div>
  ${clsNames.length?`<div class="grid">${clsNames.map(cn=>{const roles=[...new Set(byCls[cn].map(c=>c.role))];return `<div class="cls"><h3>${esc(cn)} <small>${esc(roles[0])}</small></h3>${byCls[cn].map(c=>{const k=keyOf(c),u=unitsOf(k)[0],pn=pendOfKey(k),th=SUBJ[c.subject]||['📘','#eee'];return `<button class="sj" style="background:${th[1]}" data-act="open" data-k="${esc(k)}">${th[0]} ${esc(c.subject)}${pn?`<span class="bd">あと${pn}人</span>`:''}<small>${esc(u.name)} ${u.periods.length}時間</small></button>`}).join('')}</div>`}).join('')}</div>`:'<div class="card">まだ授業が登録されていません。下の「授業を追加」から登録してください。</div>'}
- ${vLetterSw()}
  <div class="botrow">
   <div class="card"><div class="lbl" style="font-size:13px">➕ 授業を追加</div>
    <div class="addrow"><div class="fld"><div class="lbl">役割</div><select data-in="addRole">${['担任','専科','教科担任制','特別支援','通級'].map(r=>`<option ${r==S.addRole?'selected':''}>${r}</option>`).join('')}</select></div>
@@ -263,7 +262,7 @@ function vLib(){
  <div class="btns"><button class="btn" data-act="regP">登録する</button></div></div>`}
 function vLetters(){
  const L=D.letters.slice().sort((a,b)=>a.daysAgo-b.daysAgo),un=unreadL(),old=D.letters.filter(l=>!l.read&&l.daysAgo>=3).length;
- return hdr(true)+`<div class="card" style="margin-top:0"><div class="ttl">📮 子どもからのお手紙</div><div class="hint" style="margin:0 0 8px">あなたを選んだ児童からのお手紙です。<b>ほかの先生や管理者には表示されません。</b>評価ではなく、気持ちを受け止めるためのものです。児童の画面では、先生のお名前が表示されてから送られています。</div>
+ return hdr(true)+vLetterSw().replace('margin-top:12px','margin-top:0')+`<div class="card"><div class="ttl">📮 子どもからのお手紙</div><div class="hint" style="margin:0 0 8px">あなたを選んだ児童からのお手紙です。<b>ほかの先生や管理者には表示されません。</b>評価ではなく、気持ちを受け止めるためのものです。児童の画面では、先生のお名前が表示されてから送られています。</div>
  ${old?`<div class="warn" style="border-radius:14px;padding:8px 12px;font-size:13px;font-weight:700;margin-bottom:8px">⏰ 3日以上たっている未読のお手紙が${old}通あります。</div>`:''}
  ${L.length?L.map(l=>`<div class="pr" style="${l.read?'':'border-color:#FF5A5F;background:#FFF7F5'}"><div class="prh">${l.read?'':'<span class="mini2" style="background:#FF5A5F;color:#fff">未読</span>'}<b>${l.from}さん</b><span class="mini2">${l.cls}</span><span class="mini2" style="background:${l.kind=='reply'?'#FFE0D2':'#E6E0FF'}">${l.kind=='reply'?'💬 おへんじがほしい':'🤍 きいてほしいだけ'}</span><span class="hint" style="margin:0 0 0 auto">${l.date}(${l.daysAgo}日前)</span></div>
  <div style="font-size:14px;line-height:1.8;margin:8px 0;background:#fff;border-radius:12px;padding:8px 12px">${esc(l.text)}</div>
