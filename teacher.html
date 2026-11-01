@@ -126,12 +126,12 @@ function initData(){
  D.units['4年2組|外国語']=[{name:'Unit 4',goals:'',periods:[mkPeriod('2026-10-14','数をたずねよう'),mkPeriod('2026-10-28','ものの数を答えよう')],recs:{1:genRecs([],2),2:genRecs([0,1],3)}}];
  [['4年1組|算数','わり算'],['4年1組|理科','ものの温度'],['4年2組|音楽','合奏'],['5年1組|家庭科','ミシン']].forEach(([k,u],j)=>{D.units[k]=[{name:u,goals:'',periods:[mkPeriod('2026-10-16','学習のめあて1'),mkPeriod('2026-10-23','学習のめあて2')],recs:{1:genRecs([],j),2:genRecs([],j+1)}}]});
 }
-function initLetters(){D.letters=[
+function initLetters(){D.letterOn=false;D.letters=[
  {id:1,from:'さくら',cls:'4年1組',date:'10/30',daysAgo:1,kind:'reply',read:false,reply:'',text:'さいきん、ともだちと うまく はなせなくて、すこし さみしい です。'},
  {id:2,from:'みお',cls:'4年1組',date:'10/28',daysAgo:3,kind:'listen',read:false,reply:'',text:'きょう、おなかが いたく なって、きゅうしょくが たべられませんでした。ちょっと しんぱい です。'},
  {id:3,from:'そうた',cls:'4年1組',date:'10/25',daysAgo:6,kind:'reply',read:false,reply:'',text:'ひるやすみに ドッジボールに いれて もらえなくて かなしかった。'},
  {id:4,from:'ゆい',cls:'4年1組',date:'10/20',daysAgo:11,kind:'reply',read:true,reply:'おしえてくれて ありがとう。また いつでも かいてね。',text:'ピアノの はっぴょうかいが きんちょうする。'}]}
-function reset(){initData();initLetters();S={view:'home',key:null,tab:'goal',ui:0,period:1,manual:false,drafts:{},gem:'',pasted:'',review:null,detail:false,addRole:'担任',addClasses:['4年2組'],addClass:'4年2組',addSubject:'算数',confirm:null,q:'',fs:'',fg:'',pquery:'',pform:{name:'',subject:'',grades:[],purpose:'',body:'',shared:false},editP:null,stu:0,newUnit:'',copySrc:'',ask:'',askOut:'',confirmP:null,help:null,lastP:{},std:{},openL:null,replyText:''}}
+function reset(){initData();initLetters();S={view:'home',key:null,tab:'goal',ui:0,period:1,manual:false,drafts:{},gem:'',pasted:'',review:null,detail:false,addRole:'担任',addClasses:['4年2組'],addClass:'4年2組',addSubject:'算数',confirm:null,confL:false,q:'',fs:'',fg:'',pquery:'',pform:{name:'',subject:'',grades:[],purpose:'',body:'',shared:false},editP:null,stu:0,newUnit:'',copySrc:'',ask:'',askOut:'',confirmP:null,help:null,lastP:{},std:{},openL:null,replyText:''}}
 reset();
 const keyOf=c=>c.cls+'|'+c.subject;
 const unitsOf=k=>D.units[k]||(D.units[k]=[{name:'（単元を作成してください）',goals:'',periods:[mkPeriod('','')],recs:{}}]);
@@ -154,6 +154,7 @@ function vHome(){
  const multi=MULTI.includes(S.addRole);
  return hdr(false)+`<div class="greet">${BEAR}<div class="bub">お疲れさまです。${pt?`<b>コメント待ちの児童が${pt}人</b>います。`:'コメント待ちの児童は、いません。'}${unreadL()?` <b>未読のお手紙が${unreadL()}通</b>たまっています。`:''}</div><div class="chips"><span class="chip ${pt?'red':''}">💌 コメント待ち ${pt}人</span><span class="chip ${unreadL()?'red':''}" data-act="letters" style="cursor:pointer">📮 お手紙 ${unreadL()?'未読 '+unreadL()+'通':'0通'}</span><span class="chip">📝 本日の記入 38人</span><span class="chip">📅 本日の授業 3コマ</span></div></div>
  ${clsNames.length?`<div class="grid">${clsNames.map(cn=>{const roles=[...new Set(byCls[cn].map(c=>c.role))];return `<div class="cls"><h3>${esc(cn)} <small>${esc(roles[0])}</small></h3>${byCls[cn].map(c=>{const k=keyOf(c),u=unitsOf(k)[0],pn=pendOfKey(k),th=SUBJ[c.subject]||['📘','#eee'];return `<button class="sj" style="background:${th[1]}" data-act="open" data-k="${esc(k)}">${th[0]} ${esc(c.subject)}${pn?`<span class="bd">あと${pn}人</span>`:''}<small>${esc(u.name)} ${u.periods.length}時間</small></button>`}).join('')}</div>`}).join('')}</div>`:'<div class="card">まだ授業が登録されていません。下の「授業を追加」から登録してください。</div>'}
+ ${vLetterSw()}
  <div class="botrow">
   <div class="card"><div class="lbl" style="font-size:13px">➕ 授業を追加</div>
    <div class="addrow"><div class="fld"><div class="lbl">役割</div><select data-in="addRole">${['担任','専科','教科担任制','特別支援','通級'].map(r=>`<option ${r==S.addRole?'selected':''}>${r}</option>`).join('')}</select></div>
@@ -164,6 +165,11 @@ function vHome(){
    <div style="display:flex;margin-top:8px"><span class="hint" style="margin:0">専科・教科担任制・特別支援・通級は、クラスを複数選べます。</span><button class="btn w sm red" style="margin-left:auto" data-act="remove">授業を削除</button></div></div>
   <div class="card"><div class="lbl" style="font-size:13px">📚 プロンプトライブラリ</div><div style="font-size:12px;line-height:1.6;margin:2px 0 8px">先生方が共有しているプロンプトの一覧を見たり、登録したりできます。</div><button class="btn" data-act="library">ライブラリを開く</button></div>
  </div>`}
+function vLetterSw(){const on=D.letterOn;
+ return `<div class="card" style="margin-top:12px"><div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:240px"><div class="lbl" style="font-size:13px">📮 子どもからのお手紙を受け取る</div><div style="font-size:12px;line-height:1.6;margin-top:2px">${on?'<b style="color:#3d7a35">オン</b>です。あなたの授業があるクラスの児童が、あなたを宛先に選べます。':'<b>オフ</b>です。児童の宛先には表示されません。'}</div></div>
+ <button class="btn ${on?'w':''}" data-act="${on?'letterOff':'letterAsk'}">${on?'オフにする':'オンにする'}</button></div>
+ ${S.confL?`<div class="warn" style="border-radius:14px;padding:10px 14px;margin-top:10px;font-size:13px;line-height:1.8"><b>オンにする前に</b><br>・子どもから、悩みなどが届くことがあります。<br>・読めるのは、あなただけです(ほかの先生や管理者には表示されません)。<br>・すぐには読めないこともあります。無理のない範囲で大丈夫です。<br>・いつでもオフにできます。オフにしても、届いたお手紙は読めます。<div class="btns" style="margin-top:8px"><button class="btn sm" data-act="letterOn">オンにする</button><button class="btn w sm" data-act="letterCancel">やめる</button></div></div>`:''}
+ <div class="hint" style="margin:8px 0 0">オフの先生は、児童が宛先を選ぶ画面に出ません。授業のあるクラスで、オンの先生が一人もいないと、そのクラスの児童には「せんせいに おてがみ」のボタン自体が表示されません。</div></div>`}
 function periodPicker(u){return `<div class="per">${u.periods.map((p,i)=>{const n=i+1,pn=(u.recs[n]||[]).filter(isPend).length;return `<button data-act="per" data-n="${n}" class="${S.period==n?'on':''}">${n}${pn?`<span class="bd">${pn}</span>`:''}</button>`}).join('')}<button data-act="addPeriod" title="時数を追加">＋</button></div>`}
 function vClass(){
  const [cls,subject]=S.key.split('|'),us=unitsOf(S.key),u=curUnit(),role=(D.classes.find(c=>keyOf(c)==S.key)||{}).role||'担任';
@@ -276,6 +282,7 @@ function render(){
 const go=v=>{S.view=v;window.scrollTo(0,0);render()};
 const P=()=>curUnit().periods[S.period-1];
 const A={
+ letterAsk:()=>{S.confL=true;render()},letterCancel:()=>{S.confL=false;render()},letterOn:()=>{D.letterOn=true;S.confL=false;render();toast('お手紙の受け取りをオンにしました')},letterOff:()=>{D.letterOn=false;S.confL=false;render();toast('オフにしました(届いたお手紙は読めます)')},
  readL:d=>{D.letters.find(l=>l.id==+d.id).read=true;render()},replyL:d=>{S.openL=+d.id;S.replyText='';D.letters.find(l=>l.id==+d.id).read=true;render()},cancelL:()=>{S.openL=null;render()},sendL:d=>{if(!S.replyText.trim()){toast('返事を入力してください');return}D.letters.find(l=>l.id==+d.id).reply=S.replyText.trim();S.openL=null;render();toast('返事を送りました')},
  reset:()=>{reset();render();toast('最初の状態に戻しました')},
  home:()=>go('home'),letters:()=>go('letters'),guide:()=>go('guide'),ask:()=>go('ask'),library:()=>go('lib'),remove:()=>go('remove'),
@@ -334,6 +341,4 @@ document.getElementById('app').addEventListener('change',e=>{const k=e.target.da
 document.getElementById('app').addEventListener('toggle',e=>{if(e.target.dataset&&e.target.dataset.det)S.detail=e.target.open},true);
 render();
 </script>
-
-
 </html>
