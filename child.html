@@ -176,7 +176,7 @@ textarea{min-height:140px;font-size:16px}
 </div>
 <script>
 const OL='#6b5646';
-const COL={bear:['#C99A6B','#F3E0C7','くま'],cat:['#E4DFD3','#fff','ねこ'],rabbit:['#fff','#FFE3EA','うさぎ'],dog:['#E8C28A','#FFF3DC','いぬ'],lion:['#F2C46B','#FFF0C9','ライオン'],chick:['#FFD84D','#FFF0A8','ひよこ'],hamster:['#DE9D5E','#FFFFFF','ハムスター'],koala:['#B9BCC4','#EEF0F3','コアラ'],elephant:['#B7C6DB','#E4ECF6','ぞう']};
+const COL={bear:['#C99A6B','#F3E0C7','くま'],cat:['#E4DFD3','#fff','ねこ'],rabbit:['#fff','#FFE3EA','うさぎ'],dog:['#E8C28A','#FFF3DC','いぬ'],lion:['#F2C46B','#FFF0C9','ライオン'],chick:['#FFD84D','#FFF0A8','ひよこ'],hamster:['#DE9D5E','#FFFFFF','ハムスター'],koala:['#B9BCC4','#EEF0F3','コアラ'],elephant:['#B7C6DB','#E4ECF6','ぞう'],redpanda:['#D8672C','#F2C9A4','レッサーパンダ']};
 function charSVG(t){
  const [b,bl]=COL[t];
  if(t=='hamster')return `<svg viewBox="0 0 100 110"><ellipse cx="50" cy="105" rx="32" ry="5.5" fill="rgba(0,0,0,.15)"/>
@@ -196,6 +196,7 @@ function charSVG(t){
  <ellipse class="fl" cx="34" cy="102" rx="9" ry="5.5" fill="#F6C9B4" stroke="${OL}" stroke-width="1.6"/>
  <ellipse class="fr" cx="66" cy="102" rx="9" ry="5.5" fill="#F6C9B4" stroke="${OL}" stroke-width="1.6"/>
 </g></svg>`;
+ const fc=t=='redpanda'?'#5C3A2E':null;
  let ears='',face='',tail='',extra='';const H=t=='hamster',brx=H?31:23,bry=H?22:20,hrx=H?44:35,hry=H?32:30;
  if(t=='bear')ears=`<circle cx="22" cy="26" r="11" fill="${b}" stroke="${OL}" stroke-width="1.6"/><circle cx="78" cy="26" r="11" fill="${b}" stroke="${OL}" stroke-width="1.6"/><circle cx="22" cy="27" r="5" fill="#F6C9B4"/><circle cx="78" cy="27" r="5" fill="#F6C9B4"/>`;
  if(t=='cat')ears=`<path d="M19 34 L24 8 L44 22Z" fill="${b}" stroke="${OL}" stroke-width="1.6" stroke-linejoin="round"/><path d="M81 34 L76 8 L56 22Z" fill="${b}" stroke="${OL}" stroke-width="1.6" stroke-linejoin="round"/><path d="M25 26 L27 15 L36 22Z" fill="#F6B9C4"/><path d="M75 26 L73 15 L64 22Z" fill="#F6B9C4"/>`,tail=`<path d="M70 92 q22 -2 20 -22" fill="none" stroke="${OL}" stroke-width="7" stroke-linecap="round"/><path d="M70 92 q22 -2 20 -22" fill="none" stroke="${b}" stroke-width="4.5" stroke-linecap="round"/>`;
@@ -206,18 +207,26 @@ function charSVG(t){
  if(t=='koala')ears=`<circle cx="18" cy="28" r="15" fill="${b}" stroke="${OL}" stroke-width="1.6"/><circle cx="82" cy="28" r="15" fill="${b}" stroke="${OL}" stroke-width="1.6"/><circle cx="18" cy="29" r="8.5" fill="#F7F4EF"/><circle cx="82" cy="29" r="8.5" fill="#F7F4EF"/>`;
  if(t=='elephant')ears=`<ellipse cx="16" cy="46" rx="14" ry="21" fill="${b}" stroke="${OL}" stroke-width="1.6" transform="rotate(10 13 46)"/><ellipse cx="84" cy="46" rx="14" ry="21" fill="${b}" stroke="${OL}" stroke-width="1.6" transform="rotate(-10 87 46)"/><ellipse cx="17" cy="48" rx="7" ry="13" fill="#F7C6CF" transform="rotate(10 14 48)"/><ellipse cx="83" cy="48" rx="7" ry="13" fill="#F7C6CF" transform="rotate(-10 86 48)"/>`,tail=`<path d="M72 92 q14 -2 14 -14" fill="none" stroke="${OL}" stroke-width="4" stroke-linecap="round"/>`;
  if(t=='chick')ears=`<path d="M44 20 q-2 -12 6 -14 M50 19 q2 -14 10 -12 M56 21 q6 -8 12 -4" fill="none" stroke="${OL}" stroke-width="2" stroke-linecap="round"/>`;
+
+ if(t=='redpanda'){
+  ears=`<path d="M17 38 Q12 10 36 15 Q46 22 45 32Z" fill="${b}" stroke="${OL}" stroke-width="1.6" stroke-linejoin="round"/><path d="M83 38 Q88 10 64 15 Q54 22 55 32Z" fill="${b}" stroke="${OL}" stroke-width="1.6" stroke-linejoin="round"/><path d="M21 33 Q20 20 33 21 Q39 25 40 31Z" fill="#fff"/><path d="M79 33 Q80 20 67 21 Q61 25 60 31Z" fill="#fff"/>`;
+  tail=`<path d="M70 94 Q98 92 92 58" fill="none" stroke="${OL}" stroke-width="13" stroke-linecap="round"/><path d="M70 94 Q98 92 92 58" fill="none" stroke="${b}" stroke-width="10.4" stroke-linecap="round"/><path d="M70 94 Q98 92 92 58" fill="none" stroke="#8F3F1E" stroke-width="10.4" stroke-dasharray="3.2 7.2" stroke-dashoffset="-2"/>`;
+  extra=`<path d="M20 52 Q18 38 33 40 Q41 45 40 57 Q30 68 20 52Z" fill="#fff"/><path d="M80 52 Q82 38 67 40 Q59 45 60 57 Q70 68 80 52Z" fill="#fff"/><ellipse cx="50" cy="61" rx="13.5" ry="10" fill="#fff"/><ellipse cx="38" cy="39" rx="4.6" ry="2.6" fill="#fff"/><ellipse cx="62" cy="39" rx="4.6" ry="2.6" fill="#fff"/><path d="M37 52 q-1.5 5 -3 9 M63 52 q1.5 5 3 9" fill="none" stroke="#8F3F1E" stroke-width="2.4" stroke-linecap="round"/>`;
+  face=`<ellipse cx="50" cy="55" rx="3.6" ry="2.6" fill="#3a2a25"/><path d="M50 57.5 v3 M45 62.5 q5 4 10 0" fill="none" stroke="#4a3a33" stroke-width="1.5" stroke-linecap="round"/>`;
+ }
  // mouth/nose
- if(t=='bear'||t=='dog'||t=='lion')face=`<ellipse cx="50" cy="58" rx="12" ry="9" fill="${bl}"/><ellipse cx="50" cy="54" rx="3.4" ry="2.4" fill="#4a3a33"/><path d="M50 56 v3 M45 61 q5 4 10 0" fill="none" stroke="#4a3a33" stroke-width="1.5" stroke-linecap="round"/>`;
+ if(t=='redpanda'){}
+ else if(t=='bear'||t=='dog'||t=='lion')face=`<ellipse cx="50" cy="58" rx="12" ry="9" fill="${bl}"/><ellipse cx="50" cy="54" rx="3.4" ry="2.4" fill="#4a3a33"/><path d="M50 56 v3 M45 61 q5 4 10 0" fill="none" stroke="#4a3a33" stroke-width="1.5" stroke-linecap="round"/>`;
  else if(t=='hamster')face=`<g stroke="#4a3a33" stroke-width=".9" stroke-linecap="round" fill="none"><path d="M36 58 q-7 -2 -13 -4 M36 61 q-8 0 -14 0 M37 64 q-7 2 -12 5 M64 58 q7 -2 13 -4 M64 61 q8 0 14 0 M63 64 q7 2 12 5"/></g><ellipse cx="50" cy="56" rx="3" ry="2.3" fill="#F08FA6"/><path d="M50 58 v2 M45 61 q5 4 5 -1 q0 5 5 1" fill="none" stroke="#4a3a33" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><rect x="48.2" y="62" width="3.6" height="3.6" rx="1" fill="#fff" stroke="#6b5646" stroke-width=".8"/><g transform="translate(50 87)"><ellipse rx="5.5" ry="10" fill="#4b4540" stroke="${OL}" stroke-width="1.2"/><path d="M0 -9 V9 M-3 -7 q-1 7 0 14 M3 -7 q1 7 0 14" stroke="#B9AE9E" stroke-width="1.2" fill="none"/></g><ellipse cx="42" cy="86" rx="4.5" ry="3.8" fill="#F6C9B4" stroke="${OL}" stroke-width="1.2"/><ellipse cx="58" cy="86" rx="4.5" ry="3.8" fill="#F6C9B4" stroke="${OL}" stroke-width="1.2"/>`;
  else if(t=='koala')face=`<ellipse cx="50" cy="56" rx="8" ry="10.5" fill="#4b4a52"/><ellipse cx="47.5" cy="52" rx="2.2" ry="1.6" fill="#fff" opacity=".6"/><path d="M44 69 q6 4 12 0" fill="none" stroke="#4a3a33" stroke-width="1.4" stroke-linecap="round"/>`;
  else if(t=='elephant')face=`<path d="M50 56 q-1 20 8 22 q6 1 7 -6" fill="none" stroke="${OL}" stroke-width="14" stroke-linecap="round"/><path d="M50 56 q-1 20 8 22 q6 1 7 -6" fill="none" stroke="${b}" stroke-width="11.2" stroke-linecap="round"/><path d="M47 66 q4 1 7 0 M49 72 q4 1 7 0" fill="none" stroke="${OL}" stroke-width="1" opacity=".5" stroke-linecap="round"/>`;
  else if(t=='cat'||t=='rabbit')face=`<ellipse cx="50" cy="55" rx="2.6" ry="2" fill="#F08FA6"/><path d="M50 57 v2 M44 61 q3 3 6 0 q3 3 6 0" fill="none" stroke="#4a3a33" stroke-width="1.5" stroke-linecap="round"/>`;
  else face=`<path d="M43 55 q7 -3 14 0 q-7 9 -14 0Z" fill="#FF9F43" stroke="#d9772a" stroke-width="1.2" stroke-linejoin="round"/>`;
- const arm=t=='chick'?'#F2BC1F':b;
+ const arm=t=='chick'?'#F2BC1F':(fc||b);
  return `<svg viewBox="0 0 100 110"><ellipse cx="50" cy="104" rx="30" ry="6" fill="rgba(0,0,0,.15)"/>
  <g class="bodyg">${tail}
-  <ellipse class="fl" cx="37" cy="100" rx="11" ry="6.5" fill="${b}" stroke="${OL}" stroke-width="1.6"/>
-  <ellipse class="fr" cx="63" cy="100" rx="11" ry="6.5" fill="${b}" stroke="${OL}" stroke-width="1.6"/>
+  <ellipse class="fl" cx="37" cy="100" rx="11" ry="6.5" fill="${fc||b}" stroke="${OL}" stroke-width="1.6"/>
+  <ellipse class="fr" cx="63" cy="100" rx="11" ry="6.5" fill="${fc||b}" stroke="${OL}" stroke-width="1.6"/>
   <ellipse cx="50" cy="82" rx="${brx}" ry="${bry}" fill="${b}" stroke="${OL}" stroke-width="1.6"/>
   <ellipse cx="50" cy="86" rx="${H?24:13}" ry="${H?16:13}" fill="${bl}"/>
   <ellipse cx="${H?25:27}" cy="${H?86:80}" rx="6" ry="10" fill="${arm}" stroke="${OL}" stroke-width="1.6" transform="rotate(22 27 80)"/>
@@ -226,7 +235,7 @@ function charSVG(t){
   <ellipse cx="50" cy="48" rx="${hrx}" ry="${hry}" fill="${b}" stroke="${OL}" stroke-width="1.6"/>
   ${extra}
   <g class="eyes"><circle cx="38" cy="49" r="3.4" fill="#3b2f2a"/><circle cx="62" cy="49" r="3.4" fill="#3b2f2a"/><circle cx="39" cy="47.8" r="1.1" fill="#fff"/><circle cx="63" cy="47.8" r="1.1" fill="#fff"/></g>
-  <ellipse cx="29" cy="58" rx="6" ry="3.8" fill="#FFADB5" opacity="${H?0:.75}"/><ellipse cx="71" cy="58" rx="6" ry="3.8" fill="#FFADB5" opacity="${H?0:.75}"/>
+  <ellipse cx="29" cy="58" rx="6" ry="3.8" fill="#FFADB5" opacity="${H||t=='redpanda'?0:.75}"/><ellipse cx="71" cy="58" rx="6" ry="3.8" fill="#FFADB5" opacity="${H||t=='redpanda'?0:.75}"/>
   ${face}
  </g></svg>`;
 }
@@ -257,7 +266,7 @@ const ITEMLIST=Object.assign({house:HORD.map(k=>({n:HNAME[k],w:ITEMS[k].w,svg:IT
 const POSALL=Object.assign({house:HORD.map(k=>HPOS[k])},NEWPOS);
 const PER=[{n:1,d:'10/21',g:'ものがたりの じょうけいを つかもう'},{n:2,d:'10/23',g:'ごんの ぎもんを みつけよう'},{n:3,d:'10/28',g:'ごんの きもちを かんがえよう'},{n:4,d:'10/30',g:'ごんと ひょうじゅうの かんけいを まとめよう'}];
 const SAMPLE='ごんが ひょうじゅうに つぐないを するところで、ごんの さみしさが わかった。';
-const MATES=[['bear',0],['cat',0],['rabbit',0],['dog',5],['chick',10],['lion',25],['hamster',40],['koala',85],['elephant',110]];
+const MATES=[['bear',0],['cat',0],['rabbit',0],['dog',5],['chick',10],['lion',25],['hamster',40],['redpanda',70],['koala',85],['elephant',110]];
 const SLOTS=()=>ST.stars>=130?3:ST.stars>=60?2:1;
 const cnt=n=>n==3?'3びき':n+'ひき';
 const nextEvent=()=>ST.newMate?'mate':(ST.newSlot?'slot':(ST.newRoom?'roomNew':'home'));
