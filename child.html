@@ -114,7 +114,7 @@ textarea{width:100%;min-height:96px;border:2px solid #F3E2BC;background:#FFFBF0;
 .cg svg{width:100%;display:block}
 .toast{position:absolute;left:50%;bottom:18px;translate:-50% 0;background:rgba(60,50,40,.9);color:#fff;border-radius:999px;padding:8px 16px;font-size:12px;font-weight:700;z-index:99;white-space:nowrap}
 .plus{font-size:30px;font-weight:900;color:#b8860b;animation:popin .6s}
-.dragon .it,.dragon .ch{cursor:grab;touch-action:none}.dragging{cursor:grabbing!important;filter:drop-shadow(0 8px 6px rgba(0,0,0,.28))}
+.dragon .it{cursor:grab;touch-action:none}.dragon .ch{cursor:pointer}.dragging{cursor:grabbing!important;filter:drop-shadow(0 8px 6px rgba(0,0,0,.28))}
 .wrapx{max-width:1080px;flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:12px}
 .col{width:100%;max-width:none}
 .phone{min-height:auto;padding:18px 28px 26px;font-size:16px;border-radius:32px}
@@ -365,7 +365,7 @@ function mount(room,edit,newIdx){
  if(edit){
   room.classList.add('dragon');
   let c=null,cc=null,sx=0,sy=0,moved=false;
-  room.addEventListener('pointerdown',e=>{const t=e.target.closest('.it,.ch');if(!t)return;c=t;cc=t.classList.contains('ch')?CUR.chs[+t.dataset.ci]:null;moved=false;sx=e.clientX;sy=e.clientY;t.setPointerCapture(e.pointerId);e.preventDefault()});
+  room.addEventListener('pointerdown',e=>{const t=e.target.closest('.it,.ch');if(!t)return;if(t.classList.contains('ch')){tap(CUR.chs[+t.dataset.ci]);return}c=t;cc=t.classList.contains('ch')?CUR.chs[+t.dataset.ci]:null;moved=false;sx=e.clientX;sy=e.clientY;t.setPointerCapture(e.pointerId);e.preventDefault()});
   room.addEventListener('pointermove',e=>{if(!c)return;
    if(!moved){if(Math.hypot(e.clientX-sx,e.clientY-sy)<6)return;moved=true;c.classList.add('dragging');if(cc){cc.busy=true;setMode(cc,'idle')}}
    const b=room.getBoundingClientRect();let x=Math.max(5,Math.min(95,(e.clientX-b.left)/b.width*100)),y=(e.clientY-b.top)/b.height*100;
