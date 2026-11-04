@@ -290,7 +290,7 @@ const SCR={
   <div class="center" style="font-size:13px;font-weight:900;margin-top:10px">${ST.types.length} / ${SLOTS()} えらんだよ</div>
   <button class="btn b2 full" style="margin-top:6px;${ST.types.length>=1?'':'opacity:.5'}" data-act="startOK">${ST.types.length>=2?'この '+cnt(ST.types.length)+'と すごす!':'この子と すごす!'}</button>`,
  home:()=>`${head(false)}<div class="homeg"><div><div id="room"></div>
-  <div class="hint" style="margin:6px 0 0">👆 かざりも なかまも ドラッグして うごかせるよ</div><div class="btns"><button class="btn" data-act="companion">🐾 なかま</button>${unlockedRooms().length>1?'<button class="btn" data-act="rooms">🚪 おへや</button>':''}${ST.album.length?'<button class="btn" data-act="album">📖 アルバム</button>':''}<button class="btn" data-act="letter" style="position:relative">💌 せんせいに おてがみ${ST.replyArrived?'<span class="badge" style="top:-10px">おへんじ!</span>':''}</button></div></div>
+  <div class="btns"><button class="btn" data-act="companion">🐾 なかま</button>${unlockedRooms().length>1?'<button class="btn" data-act="rooms">🚪 おへや</button>':''}${ST.album.length?'<button class="btn" data-act="album">📖 アルバム</button>':''}<button class="btn" data-act="letter" style="position:relative">💌 せんせいに おてがみ${ST.replyArrived?'<span class="badge" style="top:-10px">おへんじ!</span>':''}</button></div></div>
   <div class="grid">
    <div class="tile" data-act="subject" style="background:#FFD9D9">${unwritten()?`<div class="badge">あと${unwritten()}</div>`:''}<div class="ic">📕</div><div class="nm">国語</div><div class="st">${unwritten()?'かける時間 '+unwritten():'ぜんぶ かいたよ'}</div></div>
    <div class="tile" data-act="other" style="background:#D9ECFF"><div class="ic">🔢</div><div class="nm">算数</div><div class="st">ぜんぶ かいたよ</div></div>
